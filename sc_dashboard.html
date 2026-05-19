@@ -1,0 +1,1083 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SCA Jayanagar Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+:root{
+  --nv:#01354D;--nv2:#024E72;--nv3:#1F7BB2;--nv4:#0B6291;
+  --rd:#EE1C23;--rd2:#D4181F;--yl:#FFC10E;--yl2:#B8870A;
+  --n50:#F2F6F9;--n100:#E6EEF4;--r50:#FEF3F3;--r100:#FDE5E6;
+  --y50:#FFFAE8;--y100:#FFF3D0;
+  --bg:#EEF2F7;--su:#fff;--sb:#F5F8FC;--bd:#DDE4EF;--bs:#C8D3E3;
+  --tp:#0A1929;--ts:#3D5166;--tm:#7A8FA6;
+  --sh:0 1px 3px rgba(10,25,41,.07),0 1px 2px rgba(10,25,41,.04);
+  --shm:0 4px 16px rgba(1,53,77,.12);
+  --fn:'Inter',sans-serif;--fm:'JetBrains Mono',monospace;
+  --sidebar:220px;
+}
+[data-theme=dark]{
+  --bg:#030D14;--su:#071827;--sb:rgba(255,255,255,.04);--bd:rgba(255,255,255,.07);--bs:rgba(255,255,255,.14);
+  --tp:#E8F2FA;--ts:#8AAFC8;--tm:#4A6A82;
+  --n50:#0B2338;--n100:#0F2D47;--r50:rgba(238,28,35,.12);--r100:rgba(238,28,35,.2);
+  --y50:rgba(255,193,14,.1);--y100:rgba(255,193,14,.18);
+  --sh:0 1px 3px rgba(0,0,0,.4);--shm:0 4px 16px rgba(0,0,0,.5);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;font-family:var(--fn);background:var(--bg);color:var(--tp);font-size:14px;line-height:1.5;-webkit-font-smoothing:antialiased}
+button{font-family:var(--fn);cursor:pointer}
+img{display:block;max-width:100%}
+.app{display:flex;flex-direction:column;height:100vh;overflow:hidden}
+
+/* LOGO BAR */
+.lbar{background:linear-gradient(135deg,#01354D 0%,#024E72 60%,#0B6291 100%);display:flex;align-items:center;padding:0 18px;height:58px;flex-shrink:0;gap:14px;box-shadow:0 2px 12px rgba(1,53,77,.35);position:relative;overflow:hidden}
+.lbar::after{content:'';position:absolute;right:-60px;top:-30px;width:200px;height:200px;border-radius:50%;background:radial-gradient(circle,rgba(255,193,14,.15),transparent 70%)}
+.lbar-logo{height:42px;width:auto;object-fit:contain;flex-shrink:0;border-radius:5px;background:#fff;padding:2px 6px}
+.lbar-sep{width:1px;height:30px;background:rgba(255,255,255,.2);flex-shrink:0}
+.lbar-info{flex:1}
+.lbar-branch{color:rgba(255,255,255,.95);font-size:12px;font-weight:700;letter-spacing:.03em}
+.lbar-sub{color:rgba(255,255,255,.45);font-size:10px;font-weight:500;letter-spacing:.06em;text-transform:uppercase;margin-top:1px}
+.lbar-right{display:flex;align-items:center;gap:8px}
+.lbar-clk{font-family:var(--fm);font-size:12px;color:rgba(255,255,255,.8);background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.18);border-radius:7px;padding:4px 10px;letter-spacing:.05em}
+.ib{width:32px;height:32px;border-radius:8px;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.1);color:rgba(255,255,255,.85);display:flex;align-items:center;justify-content:center;cursor:pointer}
+.ib:hover{background:rgba(255,255,255,.18)}
+.ib svg{display:block}
+
+/* BODY */
+.body-row{display:flex;flex:1;overflow:hidden}
+
+/* SIDEBAR */
+.sidebar{width:var(--sidebar);flex-shrink:0;background:linear-gradient(180deg,#01354D 0%,#024E72 100%);display:flex;flex-direction:column;overflow:hidden;box-shadow:3px 0 16px rgba(1,53,77,.22)}
+.sb-nav{flex:1;overflow-y:auto;padding:8px 7px}
+.sb-nav::-webkit-scrollbar{width:3px}
+.sb-nav::-webkit-scrollbar-thumb{background:rgba(255,255,255,.15);border-radius:2px}
+.sb-sec{font-size:9px;letter-spacing:.16em;text-transform:uppercase;color:rgba(255,255,255,.3);padding:14px 9px 4px;font-weight:700}
+.ni{display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:8px;font-size:12.5px;font-weight:500;color:rgba(255,255,255,.6);border:none;background:none;cursor:pointer;width:100%;text-align:left;transition:background .13s,color .13s;position:relative}
+.ni:hover{background:rgba(255,255,255,.09);color:rgba(255,255,255,.9)}
+.ni.active{background:rgba(255,255,255,.15);color:#fff;font-weight:600}
+.ni.active::before{content:'';position:absolute;left:0;top:6px;bottom:6px;width:3px;background:#FFC10E;border-radius:0 2px 2px 0}
+.ni .ni-ico{width:16px;height:16px;flex-shrink:0;display:flex;align-items:center;justify-content:center;opacity:.75}
+.ni.active .ni-ico{opacity:1}
+.ni .ni-ico svg{display:block;width:15px;height:15px}
+.sb-foot{padding:10px 7px;border-top:1px solid rgba(255,255,255,.08)}
+.sb-user{display:flex;align-items:center;gap:8px;padding:8px 10px}
+.sb-av{width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,#FFC10E,#B8870A);color:#01354D;font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.sb-un{font-size:12px;font-weight:700;color:#fff}
+.sb-ur{font-size:9.5px;color:rgba(255,255,255,.4);text-transform:uppercase;letter-spacing:.06em}
+
+/* CONTENT */
+.cnt{flex:1;overflow-y:auto;padding:20px 22px}
+.sec{display:none}.sec.on{display:block}
+
+/* PAGE HEADER */
+.phd{margin-bottom:18px;display:flex;align-items:center;gap:12px}
+.phd-ico{width:42px;height:42px;border-radius:11px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.phd-ico svg{display:block;width:22px;height:22px}
+.phd-title{font-size:21px;font-weight:800;color:var(--tp);letter-spacing:-.02em}
+.phd-sub{font-size:12px;color:var(--tm);margin-top:2px}
+
+/* TOPBAR STRIP */
+.topstrip{background:var(--su);border-bottom:1px solid var(--bd);padding:10px 20px;display:flex;align-items:center;gap:8px;box-shadow:var(--sh);flex-shrink:0;flex-wrap:wrap}
+.ts-label{font-size:11px;font-weight:700;color:var(--ts);letter-spacing:.04em;text-transform:uppercase;white-space:nowrap}
+
+/* KPI ROW */
+.krow{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:16px}
+.kc{border-radius:15px;padding:14px 16px 11px;position:relative;overflow:hidden;transition:transform .16s,box-shadow .16s;cursor:default}
+.kc:hover{transform:translateY(-2px);box-shadow:var(--shm)}
+.kc-navy{background:linear-gradient(135deg,#01354D,#024E72);color:#fff}
+.kc-light{background:var(--su);border:1px solid var(--bd);box-shadow:var(--sh)}
+.kc-red{background:linear-gradient(135deg,#D4181F,#EE1C23);color:#fff}
+.kc::after{content:'';position:absolute;right:-20px;bottom:-20px;width:90px;height:90px;border-radius:50%;background:radial-gradient(circle,rgba(255,255,255,.1),transparent 70%)}
+.kc-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:8px}
+.ki{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.ki svg{display:block;width:15px;height:15px}
+.ki-w{background:rgba(255,255,255,.18);color:#fff}
+.ki-n{background:var(--n50);color:var(--nv)}
+.ki-r{background:var(--r50);color:var(--rd)}
+.kbg{font-size:10px;font-weight:700;padding:2px 8px;border-radius:99px;border:1px solid;white-space:nowrap}
+.kbg-w{background:rgba(255,255,255,.15);color:#fff;border-color:rgba(255,255,255,.25)}
+.kbg-n{background:var(--n50);color:var(--nv);border-color:var(--n100)}
+.kbg-r{background:var(--r50);color:#B0151B;border-color:var(--r100)}
+.klbl{font-size:11px;font-weight:600;margin-bottom:3px}
+.kval{font-family:var(--fm);font-size:28px;font-weight:700;line-height:1;margin-bottom:6px;letter-spacing:-.02em}
+.kpb{height:4px;border-radius:2px;overflow:hidden;margin-bottom:7px}
+.kpb-light{background:var(--bd)}
+.kpb-dark{background:rgba(255,255,255,.2)}
+.kpb-f{height:100%;border-radius:2px}
+.kft{display:flex;align-items:center;justify-content:space-between;font-size:11px;font-weight:600}
+
+/* GRADIENT STRIP */
+.gstrip{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px}
+.gs{background:var(--su);border:1px solid var(--bd);border-radius:12px;padding:12px 14px;text-align:center;box-shadow:var(--sh);border-top:3px solid transparent}
+.gs-v{font-family:var(--fm);font-size:20px;font-weight:700;line-height:1}
+.gs-l{font-size:10.5px;color:var(--tm);margin-top:4px;font-weight:500}
+
+/* BLOCK */
+.blk{background:var(--su);border:1px solid var(--bd);border-radius:14px;box-shadow:var(--sh);margin-bottom:16px;overflow:hidden}
+.bh{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;flex-wrap:wrap;gap:8px;border-bottom:1px solid var(--bd)}
+.bhl{display:flex;align-items:center;gap:9px}
+.bico{width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.bico svg{display:block;width:16px;height:16px}
+.bin{background:linear-gradient(135deg,#F2F6F9,#E6EEF4);color:#01354D}
+.bir{background:linear-gradient(135deg,#FEF3F3,#FDE5E6);color:#EE1C23}
+.biy{background:linear-gradient(135deg,#FFFAE8,#FFF3D0);color:#B8870A}
+.bigr{background:linear-gradient(135deg,#ECFDF5,#D1FAE5);color:#059669}
+.bt{font-size:13px;font-weight:700;color:var(--tp)}
+.bsub{font-size:11px;color:var(--tm);margin-top:1px}
+.bb{padding:14px 16px}
+
+/* FILTER BAR */
+.fb{display:flex;align-items:center;gap:8px;padding:8px 16px;background:var(--sb);border-bottom:1px solid var(--bd);flex-wrap:wrap}
+.fb-lbl{font-size:11px;font-weight:700;color:var(--ts);letter-spacing:.04em;text-transform:uppercase;white-space:nowrap;flex-shrink:0}
+.fb-sep{width:1px;height:22px;background:var(--bd);flex-shrink:0}
+
+/* PILL TOGGLE */
+.pt{display:inline-flex;background:var(--sb);border:1px solid var(--bd);border-radius:99px;padding:2px;gap:1px}
+.pb{padding:5px 13px;border-radius:99px;font-size:11.5px;font-weight:600;color:var(--tm);background:none;border:none;transition:.13s;white-space:nowrap}
+.pb.on{background:var(--nv);color:#fff;box-shadow:0 2px 6px rgba(1,53,77,.28)}
+
+/* FILTER PILLS */
+.fp{display:flex;flex-wrap:wrap;gap:5px}
+.fpb{padding:4px 11px;border-radius:99px;font-size:11.5px;font-weight:600;color:var(--ts);background:var(--su);border:1px solid var(--bd);cursor:pointer;transition:.13s;white-space:nowrap}
+.fpb.on{background:var(--nv);color:#fff;border-color:var(--nv)}
+
+/* SELECT */
+.sel{height:30px;padding:0 9px;border:1px solid var(--bs);border-radius:8px;font-size:12px;background:var(--su);color:var(--tp);font-family:var(--fn)}
+
+/* TABLE */
+.tw{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:12.5px}
+th{padding:7px 11px;text-align:left;font-weight:700;font-size:10px;text-transform:uppercase;letter-spacing:.07em;color:var(--tm);background:var(--sb);border-bottom:1px solid var(--bd);white-space:nowrap;position:sticky;top:0;z-index:1}
+th.r,td.r{text-align:right}
+td{padding:9px 11px;border-bottom:1px solid var(--bd);color:var(--tp);vertical-align:middle}
+tr:last-child td{border:none}
+tr:hover td{background:var(--sb)}
+.num{font-family:var(--fm);font-variant-numeric:tabular-nums}
+.tot td{font-weight:700;background:linear-gradient(90deg,#F2F6F9,#E6EEF4)!important;color:#01354D;border-top:2px solid #E6EEF4!important}
+.rg td{background:rgba(1,53,77,.04)!important}.ra td{background:rgba(255,193,14,.07)!important}.rr td{background:rgba(238,28,35,.05)!important}
+
+/* CHIP */
+.ch{display:inline-flex;align-items:center;padding:2px 7px;border-radius:99px;font-size:10px;font-weight:600;border:1px solid;white-space:nowrap}
+.cg{background:var(--n50);color:var(--nv);border-color:var(--n100)}
+.ca{background:var(--y50);color:var(--yl2);border-color:var(--y100)}
+.cr{background:var(--r50);color:#B0151B;border-color:var(--r100)}
+
+/* GRIDS */
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+.g12{display:grid;grid-template-columns:1.5fr 1fr;gap:14px}
+.g21{display:grid;grid-template-columns:2fr 1fr;gap:14px}
+
+/* STREAM CARD */
+.sc{padding:10px 12px;background:linear-gradient(135deg,var(--sb),var(--su));border:1px solid var(--bd);border-radius:9px;margin-bottom:7px}
+.sc:last-child{margin-bottom:0}
+.sc-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:5px}
+.sc-pb{height:5px;background:var(--bd);border-radius:3px;overflow:hidden;margin-bottom:4px}
+.sc-pf{height:100%;border-radius:3px}
+.sc-nums{display:flex;justify-content:space-between;font-size:10.5px;color:var(--tm)}
+
+/* DROPOUT KPI */
+.dkr{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px}
+.dk{padding:12px 14px;border-radius:10px;border:1px solid}
+
+/* MINI BAR */
+.mbc{display:flex;align-items:center;gap:5px}
+.mbg{flex:1;height:5px;background:var(--bd);border-radius:3px;overflow:hidden;min-width:40px}
+.mbf{height:100%;border-radius:3px}
+
+/* COUNSELOR CARD */
+.ec{background:linear-gradient(135deg,var(--sb),var(--su));border:1px solid var(--bd);border-radius:11px;padding:14px 16px;margin-bottom:10px}
+.ec:last-child{margin-bottom:0}
+.ec-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.ec-name{font-size:13px;font-weight:700;color:var(--tp)}
+.ec-bar-bg{height:6px;background:var(--bd);border-radius:3px;overflow:hidden;margin-top:3px;margin-bottom:8px}
+.ec-bar-f{height:100%;border-radius:3px}
+.ec-row{display:flex;justify-content:space-between;font-size:11px;color:var(--tm);margin-bottom:2px}
+.ec-av{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;flex-shrink:0}
+
+/* INSTALLMENT */
+.ins-tbl{width:100%;border-collapse:collapse;font-size:12px}
+.ins-tbl th{padding:7px 9px;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--tm);background:var(--sb);border-bottom:1px solid var(--bd);white-space:nowrap;text-align:center}
+.ins-tbl th:first-child{text-align:left}
+.ins-tbl td{padding:8px 9px;border-bottom:1px solid var(--bd);text-align:center;font-family:var(--fm);font-size:11.5px}
+.ins-tbl td:first-child{text-align:left;font-family:var(--fn);font-weight:600;font-size:12.5px}
+.ins-tbl .tot td{font-weight:700;background:#F2F6F9!important;color:#01354D;border-top:2px solid #E6EEF4!important}
+.ig{color:#01354D;font-weight:700}.ib2{color:#EE1C23;font-weight:700}
+
+/* ACADEMICS / OPS */
+.ac-card{background:var(--su);border:1px solid var(--bd);border-radius:12px;box-shadow:var(--sh);margin-bottom:10px;overflow:hidden;transition:box-shadow .15s}
+.ac-card:hover{box-shadow:var(--shm)}
+.ac-hd{display:flex;align-items:center;justify-content:space-between;padding:13px 16px;cursor:pointer}
+.ac-left{display:flex;align-items:center;gap:10px}
+.ac-ico{width:36px;height:36px;border-radius:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.ac-ico svg{display:block;width:17px;height:17px}
+.ac-title{font-size:13px;font-weight:700;color:var(--tp)}
+.ac-sub{font-size:11px;color:var(--tm);margin-top:1px}
+.ac-body{display:none;padding:0 16px 16px;border-top:1px solid var(--bd)}
+.ac-body.open{display:block;padding-top:14px}
+.coming{text-align:center;padding:28px 16px;color:var(--tm);font-size:13px;background:var(--sb);border-radius:9px;line-height:1.7}
+
+/* PAY DETAIL */
+.pd{display:flex;align-items:center;gap:7px;margin-bottom:7px}
+.pd:last-child{margin-bottom:0}
+
+/* REV EXP HERO */
+.re-hero{background:linear-gradient(135deg,#01354D,#024E72);border-radius:14px;padding:20px;color:#fff;margin-bottom:16px;position:relative;overflow:hidden}
+.re-hero::after{content:'';position:absolute;right:-30px;bottom:-30px;width:150px;height:150px;border-radius:50%;background:radial-gradient(circle,rgba(255,193,14,.2),transparent 70%)}
+.dummy-badge{display:inline-flex;align-items:center;gap:5px;font-size:10px;font-weight:700;padding:3px 9px;border-radius:99px;background:rgba(255,193,14,.2);color:#FFC10E;border:1px solid rgba(255,193,14,.3);margin-bottom:10px}
+
+/* UC */
+.uc{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:40vh;gap:12px;text-align:center;padding:32px}
+.ucico{width:64px;height:64px;background:var(--n50);border-radius:50%;display:flex;align-items:center;justify-content:center;color:var(--nv);animation:pulse 2s ease-in-out infinite}
+.ucico svg{display:block;width:28px;height:28px}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.06)}}
+
+::-webkit-scrollbar{width:4px;height:4px}
+::-webkit-scrollbar-thumb{background:var(--bs);border-radius:3px}
+@media(max-width:900px){.krow,.g3,.dkr,.gstrip{grid-template-columns:1fr 1fr}.g12,.g21,.g2{grid-template-columns:1fr}.sidebar{width:56px}}
+@media(max-width:520px){.krow{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<script>
+// ── RAW SVG ICONS (no external font dependency) ──
+const IC={
+  dash:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>',
+  trend:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>',
+  up:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>',
+  dn:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 17 13.5 8.5 8.5 13.5 2 7"/><polyline points="16 17 22 17 22 11"/></svg>',
+  school:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c0 2 6 3 6 3s6-1 6-3v-5"/></svg>',
+  money:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="3"/></svg>',
+  users:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="7" r="4"/><path d="M3 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/><path d="M21 21v-2a4 4 0 0 0-3-3.85"/></svg>',
+  ucheck:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="7" r="4"/><path d="M3 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2"/><path d="M16 11l2 2 4-4"/></svg>',
+  uminus:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="7" r="4"/><path d="M3 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2"/><line x1="17" y1="13" x2="23" y2="13"/></svg>',
+  pie:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M10 3.2A9 9 0 1 0 20.8 14H12a2 2 0 0 1-2-2z"/><path d="M13 3.5V12h8.5A9 9 0 0 0 13 3.5z"/></svg>',
+  bar:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="12" width="4" height="9"/><rect x="10" y="7" width="4" height="14"/><rect x="17" y="3" width="4" height="18"/></svg>',
+  tbl:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 10h18M10 10v9"/></svg>',
+  coin:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M14.8 9A2 2 0 0 0 13 8h-2a2 2 0 0 0 0 4h2a2 2 0 0 1 0 4h-2a2 2 0 0 1-1.8-1M12 7v1m0 8v1"/></svg>',
+  card:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg>',
+  moon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9z"/></svg>',
+  sun:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>',
+  list:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>',
+  gear:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>',
+  warn:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>',
+  cash:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>',
+  chev:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>',
+  revexp:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>',
+};
+function ico(k){return IC[k]||IC.dash;}
+
+// ── DATA ──
+const RECS=[
+  {d:"13-Nov-25",b:"8 ICSE",f:90000,bk:45000,p:27486,e:"Vidhya G.S",s:"Active",dr:"",ba:"",pm:"JODO"},
+  {d:"18-Nov-25",b:"8 ICSE",f:90000,bk:45000,p:15810,e:"Soni Kumari",s:"Active",dr:"",ba:"",pm:"JODO"},
+  {d:"28-Nov-25",b:"8 CBSE",f:90000,bk:40500,p:40500,e:"Iranna Ambannavar",s:"Active",dr:"",ba:"",pm:"Full Payment"},
+  {d:"30-Nov-25",b:"8 ICSE",f:90000,bk:40500,p:15810,e:"Vidhya G.S",s:"Active",dr:"",ba:"",pm:"JODO"},
+  {d:"6-Mar-26",b:"8 ICSE",f:90000,bk:45000,p:45000,e:"Vidhya G.S",s:"Active",dr:"",ba:"",pm:"Full Payment"},
+  {d:"23-Mar-26",b:"8 ICSE",f:90000,bk:45000,p:15810,e:"Vidhya G.S",s:"Active",dr:"",ba:"",pm:"JODO"},
+  {d:"23-Mar-26",b:"8 ICSE",f:90000,bk:45000,p:45000,e:"Vidhya G.S",s:"Active",dr:"",ba:"",pm:"Full Payment"},
+  {d:"8-May-26",b:"8 ICSE",f:90000,bk:49500,p:15810,e:"Prajwal A S",s:"Active",dr:"",ba:"",pm:"JODO"},
+  {d:"9-May-26",b:"8 ICSE",f:90000,bk:49500,p:15810,e:"Prajwal A S",s:"Active",dr:"",ba:"",pm:"JODO"},
+  {d:"15-May-26",b:"8 ICSE",f:90000,bk:49500,p:15810,e:"Iranna Ambannavar",s:"Active",dr:"",ba:"",pm:"JODO"},
+  {d:"9-Nov-25",b:"9 CBSE",f:90000,bk:15300,p:15300,e:"Soni Kumari",s:"Active",dr:"",ba:"",pm:"Full Payment"},
+  {d:"11-Nov-25",b:"9 ICSE",f:90000,bk:59192,p:15810,e:"Iranna Ambannavar",s:"Active",dr:"",ba:"",pm:"Not Confirmed"},
+  {d:"29-Nov-25",b:"9 CBSE",f:90000,bk:42300,p:26406,e:"Soni Kumari",s:"Active",dr:"",ba:"",pm:"Not Confirmed"},
+  {d:"1-Dec-25",b:"9 CBSE",f:90000,bk:45000,p:27486,e:"Iranna Ambannavar",s:"Active",dr:"",ba:"",pm:"Not Confirmed"},
+  {d:"1-Dec-25",b:"9 CBSE",f:90000,bk:45000,p:27486,e:"Vidhya G.S",s:"Active",dr:"",ba:"",pm:"Not Confirmed"},
+  {d:"1-Dec-25",b:"9 CBSE",f:90000,bk:45000,p:3374,e:"M Yogesh",s:"Active",dr:"",ba:"",pm:"Not Confirmed"},
+  {d:"11-Dec-25",b:"9 CBSE",f:90000,bk:36000,p:36000,e:"Vidhya G.S",s:"Active",dr:"",ba:"",pm:"Not Confirmed"},
+  {d:"14-Dec-25",b:"9 ICSE",f:90000,bk:36000,p:15810,e:"Vidhya G.S",s:"Active",dr:"",ba:"",pm:"Not Confirmed"},
+  {d:"13-Jan-26",b:"9 CBSE",f:90000,bk:30600,p:2550,e:"Vidhya G.S",s:"Active",dr:"",ba:"",pm:"JODO"},
+  {d:"19-Jan-26",b:"9 CBSE",f:90000,bk:36000,p:23886,e:"Iranna Ambannavar",s:"Active",dr:"",ba:"",pm:"JODO"},
+  {d:"23-Jan-26",b:"9 CBSE",f:90000,bk:39000,p:15810,e:"Iranna Ambannavar",s:"Active",dr:"",ba:"",pm:"JODO"},
+  {d:"31-Jan-26",b:"9 CBSE",f:90000,bk:36000,p:2999,e:"Iranna Ambannavar",s:"Active",dr:"",ba:"",pm:"Not Confirmed"},
+  {d:"28-Feb-26",b:"9 ICSE",f:90000,bk:45000,p:3749,e:"Vidhya G.S",s:"Active",dr:"",ba:"",pm:"Not Confirmed"},
+  {d:"6-Mar-26",b:"9 ICSE",f:90000,bk:45000,p:45000,e:"Iranna Ambannavar",s:"Active",dr:"",ba:"",pm:"Not Confirmed"},
+  {d:"30-Mar-26",b:"9 CBSE",f:90000,bk:45000,p:15810,e:"Madhu M N",s:"Active",dr:"",ba:"",pm:"JODO"},
+  {d:"31-Mar-26",b:"9 CBSE",f:90000,bk:45000,p:15810,e:"Prajwal A S",s:"Active",dr:"",ba:"",pm:"JODO"},
+  {d:"31-Mar-26",b:"9 ICSE",f:90000,bk:45000,p:3749,e:"Madhu M N",s:"Active",dr:"",ba:"",pm:"Not Confirmed"},
+  {d:"31-Mar-26",b:"9 CBSE",f:90000,bk:45000,p:45000,e:"Iranna Ambannavar",s:"Active",dr:"",ba:"",pm:"Full Payment"},
+  {d:"31-Mar-26",b:"9 CBSE",f:90000,bk:45000,p:3749,e:"Iranna Ambannavar",s:"Active",dr:"",ba:"",pm:"Not Confirmed"},
+  {d:"8-Apr-26",b:"9 CBSE",f:90000,bk:45000,p:15810,e:"Prajwal A S",s:"Active",dr:"",ba:"",pm:"JODO"},
+  {d:"26-Apr-26",b:"9 CBSE",f:90000,bk:50000,p:15810,e:"Iranna Ambannavar",s:"Active",dr:"",ba:"",pm:"JODO"},
+  {d:"2-May-26",b:"9 CBSE",f:90000,bk:49500,p:15810,e:"Prajwal A S",s:"Active",dr:"",ba:"",pm:"JODO"},
+  {d:"6-May-26",b:"9 ICSE",f:90000,bk:49500,p:49500,e:"Prajwal A S",s:"Active",dr:"",ba:"",pm:"Loan"},
+  {d:"11-May-26",b:"9 ICSE",f:90000,bk:49500,p:49500,e:"Iranna Ambannavar",s:"Active",dr:"",ba:"",pm:"Full Payment"},
+  {d:"13-May-26",b:"9 ICSE",f:90000,bk:49500,p:49500,e:"Iranna Ambannavar",s:"Active",dr:"",ba:"",pm:"Full Payment"},
+  {d:"16-Nov-25",b:"10 ICSE",f:90000,bk:53100,p:15810,e:"Vidhya G.S",s:"Active",dr:"",ba:"",pm:"Not Confirmed"},
+  {d:"29-Nov-25",b:"10 ICSE",f:90000,bk:40500,p:15810,e:"Rashmi",s:"Active",dr:"",ba:"",pm:"Not Confirmed"},
+  {d:"29-Nov-25",b:"10 ICSE",f:90000,bk:45000,p:15810,e:"M Yogesh",s:"Active",dr:"",ba:"",pm:"Not Confirmed"},
+  {d:"30-Nov-25",b:"10 ICSE",f:90000,bk:40500,p:40500,e:"Lavanya",s:"Active",dr:"",ba:"",pm:"Not Confirmed"},
+  {d:"30-Nov-25",b:"10 CBSE",f:90000,bk:40500,p:15810,e:"Vidhya G.S",s:"Active",dr:"",ba:"",pm:"Not Confirmed"},
+  {d:"1-Dec-25",b:"10 ICSE",f:90000,bk:36900,p:15810,e:"Iranna Ambannavar",s:"Active",dr:"",ba:"",pm:"Not Confirmed"},
+  {d:"1-Dec-25",b:"10 ICSE",f:90000,bk:45000,p:45000,e:"Iranna Ambannavar",s:"Active",dr:"",ba:"",pm:"Not Confirmed"},
+  {d:"6-Dec-25",b:"10 CBSE",f:90000,bk:40500,p:3373,e:"M Yogesh",s:"Dropout",dr:"Not Interested",ba:"BBC",pm:"Not Confirmed"},
+  {d:"7-Dec-25",b:"10 CBSE",f:90000,bk:49500,p:49500,e:"M Yogesh",s:"Active",dr:"",ba:"",pm:"Not Confirmed"},
+  {d:"8-Dec-25",b:"10 ICSE",f:90000,bk:43000,p:15810,e:"Soni Kumari",s:"Active",dr:"",ba:"",pm:"Not Confirmed"},
+  {d:"14-Dec-25",b:"10 CBSE",f:90000,bk:40500,p:3374,e:"Vidhya G.S",s:"Dropout",dr:"Batch Timing Issue",ba:"ABC",pm:"Not Confirmed"},
+  {d:"31-Dec-25",b:"10 CBSE",f:90000,bk:36000,p:2999,e:"Vidhya G.S",s:"Active",dr:"",ba:"",pm:"JODO"},
+  {d:"11-Jan-26",b:"10 CBSE",f:90000,bk:45000,p:45000,e:"Soni Kumari",s:"Active",dr:"",ba:"",pm:"Not Confirmed"},
+  {d:"11-Jan-26",b:"10 ICSE",f:90000,bk:45000,p:26406,e:"Santhosh Kumar M N",s:"Active",dr:"",ba:"",pm:"JODO"},
+  {d:"14-Jan-26",b:"10 CBSE",f:90000,bk:42300,p:26407,e:"Santhosh Kumar M N",s:"Active",dr:"",ba:"",pm:"JODO"},
+  {d:"19-Jan-26",b:"10 ICSE",f:90000,bk:45000,p:15810,e:"Vidhya G.S",s:"Active",dr:"",ba:"",pm:"JODO"},
+  {d:"20-Jan-26",b:"10 ICSE",f:90000,bk:43200,p:43200,e:"Soni Kumari",s:"Active",dr:"",ba:"",pm:"Not Confirmed"},
+  {d:"23-Jan-26",b:"10 ICSE",f:90000,bk:50400,p:50400,e:"Soni Kumari",s:"Active",dr:"",ba:"",pm:"Not Confirmed"},
+  {d:"24-Jan-26",b:"10 CBSE",f:90000,bk:36000,p:36000,e:"Vidhya G.S",s:"Active",dr:"",ba:"",pm:"Not Confirmed"},
+  {d:"28-Feb-26",b:"10 ICSE",f:90000,bk:45000,p:15810,e:"Vidhya G.S",s:"Active",dr:"",ba:"",pm:"JODO"},
+  {d:"28-Feb-26",b:"10 CBSE",f:90000,bk:45000,p:27486,e:"Vidhya G.S",s:"Active",dr:"",ba:"",pm:"JODO"},
+  {d:"2-Mar-26",b:"10 ICSE",f:90000,bk:45000,p:45000,e:"Iranna Ambannavar",s:"Active",dr:"",ba:"",pm:"Not Confirmed"},
+  {d:"3-Mar-26",b:"10 CBSE",f:90000,bk:45000,p:45000,e:"Vidhya G.S",s:"Active",dr:"",ba:"",pm:"Not Confirmed"},
+  {d:"10-Mar-26",b:"10 ICSE",f:90000,bk:45000,p:45000,e:"Priya S",s:"Active",dr:"",ba:"",pm:"Loan"},
+  {d:"11-Mar-26",b:"10 CBSE",f:90000,bk:45000,p:27486,e:"Vidhya G.S",s:"Active",dr:"",ba:"",pm:"JODO"},
+  {d:"12-Mar-26",b:"10 ICSE",f:90000,bk:45000,p:45000,e:"Vidhya G.S",s:"Active",dr:"",ba:"",pm:"Not Confirmed"},
+  {d:"12-Mar-26",b:"10 ICSE",f:90000,bk:45000,p:27486,e:"Iranna Ambannavar",s:"Active",dr:"",ba:"",pm:"JODO"},
+  {d:"18-Mar-26",b:"10 CBSE",f:90000,bk:45000,p:40000,e:"Madhu M N",s:"Active",dr:"",ba:"",pm:"Full Payment"},
+  {d:"27-Mar-26",b:"10 ICSE",f:90000,bk:45000,p:15810,e:"Vidhya G.S",s:"Active",dr:"",ba:"",pm:"JODO"},
+  {d:"27-Mar-26",b:"10 ICSE",f:90000,bk:45000,p:15810,e:"Vidhya G.S",s:"Active",dr:"",ba:"",pm:"JODO"},
+  {d:"28-Mar-26",b:"10 ICSE",f:90000,bk:45000,p:27486,e:"Madhu M N",s:"Active",dr:"",ba:"",pm:"JODO"},
+  {d:"30-Mar-26",b:"10 ICSE",f:90000,bk:47000,p:47000,e:"Vidhya G.S",s:"Active",dr:"",ba:"",pm:"Not Confirmed"},
+  {d:"9-Apr-26",b:"10 ICSE",f:90000,bk:45000,p:45000,e:"Priya S",s:"Active",dr:"",ba:"",pm:"Loan"},
+  {d:"10-Apr-26",b:"10 CBSE",f:90000,bk:45000,p:15810,e:"Iranna Ambannavar",s:"Active",dr:"",ba:"",pm:"JODO"},
+  {d:"10-Apr-26",b:"10 ICSE",f:90000,bk:45000,p:15810,e:"Prajwal A S",s:"Active",dr:"",ba:"",pm:"JODO"},
+  {d:"30-Apr-26",b:"10 ICSE",f:90000,bk:49500,p:15810,e:"Vidhya G.S",s:"Active",dr:"",ba:"",pm:"JODO"},
+  {d:"11-May-26",b:"10 CBSE",f:90000,bk:49500,p:15810,e:"Iranna Ambannavar",s:"Active",dr:"",ba:"",pm:"JODO"},
+  {d:"2-Nov-25",b:"11 NEET INT",f:145000,bk:95000,p:19000,e:"Unknown",s:"Dropout",dr:"Others",ba:"BBC",pm:"Not Confirmed"},
+  {d:"9-Nov-25",b:"11 JEE INT",f:145000,bk:15950,p:15950,e:"Vidhya G.S",s:"Active",dr:"",ba:"",pm:"Full Payment"},
+  {d:"12-Nov-25",b:"11 NEET INT",f:145000,bk:87000,p:87000,e:"M Yogesh",s:"Active",dr:"",ba:"",pm:"Full Payment"},
+  {d:"15-Nov-25",b:"11 NEET INT",f:145000,bk:82650,p:46500,e:"Iranna Ambannavar",s:"Active",dr:"",ba:"",pm:"Not Confirmed"},
+  {d:"15-Nov-25",b:"11 NEET INT",f:145000,bk:87000,p:48240,e:"M Yogesh",s:"Active",dr:"",ba:"",pm:"Not Confirmed"},
+  {d:"21-Nov-25",b:"11 JEE INT",f:145000,bk:85000,p:47440,e:"Vidhya G.S",s:"Active",dr:"",ba:"",pm:"Not Confirmed"},
+  {d:"27-Nov-25",b:"11 JEE INT",f:145000,bk:85500,p:47660,e:"Vidhya G.S",s:"Active",dr:"",ba:"",pm:"Not Confirmed"},
+  {d:"30-Nov-25",b:"11 NEET INT",f:145000,bk:69600,p:41280,e:"Vidhya G.S",s:"Active",dr:"",ba:"",pm:"Not Confirmed"},
+  {d:"30-Nov-25",b:"11 JEE INT",f:145000,bk:75400,p:22400,e:"Soni Kumari",s:"Active",dr:"",ba:"",pm:"Not Confirmed"},
+  {d:"10-Dec-25",b:"11 JEE INT",f:145000,bk:87000,p:22400,e:"M Yogesh",s:"Active",dr:"",ba:"",pm:"Not Confirmed"},
+  {d:"10-Dec-25",b:"11 JEE INT",f:145000,bk:75400,p:75400,e:"M Yogesh",s:"Active",dr:"",ba:"",pm:"Not Confirmed"},
+  {d:"24-Dec-25",b:"11 JEE INT",f:145000,bk:81925,p:6824,e:"Santhosh Kumar M N",s:"Active",dr:"",ba:"",pm:"Not Confirmed"},
+  {d:"10-Jan-26",b:"11 JEE INT",f:145000,bk:60175,p:5013,e:"Santhosh Kumar M N",s:"Active",dr:"",ba:"",pm:"Not Confirmed"},
+  {d:"24-Feb-26",b:"11 NEET INT",f:145000,bk:60900,p:5073,e:"Vidhya G.S",s:"Dropout",dr:"Not Interested",ba:"BBC",pm:"JODO"},
+  {d:"11-Mar-26",b:"11 JEE INT",f:145000,bk:80000,p:25500,e:"Vidhya G.S",s:"Dropout",dr:"Not Interested",ba:"BBC",pm:"JODO"},
+  {d:"14-Mar-26",b:"11 NEET INT",f:145000,bk:85000,p:85000,e:"Vidhya G.S",s:"Dropout",dr:"Not Interested",ba:"BBC",pm:"Loan"},
+  {d:"17-Mar-26",b:"11 JEE INT",f:145000,bk:80000,p:80000,e:"Priya S",s:"Active",dr:"",ba:"",pm:"Not Confirmed"},
+  {d:"20-Mar-26",b:"11 JEE INT",f:145000,bk:80000,p:40000,e:"Priya S",s:"Dropout",dr:"False Commitments",ba:"BBC",pm:"Not Confirmed"},
+  {d:"23-Mar-26",b:"11 JEE INT",f:145000,bk:80000,p:6664,e:"Prajwal A S",s:"Dropout",dr:"Others",ba:"ABC",pm:"Not Confirmed"},
+  {d:"25-Mar-26",b:"11 NEET INT",f:145000,bk:72500,p:72500,e:"Unknown",s:"Active",dr:"",ba:"",pm:"Not Confirmed"},
+  {d:"31-Mar-26",b:"11 NEET INT",f:145000,bk:77000,p:46100,e:"Iranna Ambannavar",s:"Active",dr:"",ba:"",pm:"JODO"},
+  {d:"2-Apr-26",b:"11 JEE INT",f:145000,bk:90000,p:9999,e:"Madhu M N",s:"Active",dr:"",ba:"",pm:"Not Confirmed"},
+  {d:"6-Apr-26",b:"11 JEE INT",f:145000,bk:72500,p:25500,e:"Prajwal A S",s:"Active",dr:"",ba:"",pm:"JODO"},
+  {d:"8-Apr-26",b:"11 JEE INT",f:145000,bk:72500,p:72500,e:"Prajwal A S",s:"Active",dr:"",ba:"",pm:"Loan"},
+  {d:"11-Apr-26",b:"11 JEE INT",f:145000,bk:72500,p:14500,e:"Prajwal A S",s:"Dropout",dr:"Others",ba:"ABC",pm:"Not Confirmed"},
+  {d:"14-Apr-26",b:"11 JEE INT",f:145000,bk:72500,p:72500,e:"Vidhya G.S",s:"Active",dr:"",ba:"",pm:"Full Payment"},
+  {d:"15-Apr-26",b:"11 JEE INT",f:145000,bk:75000,p:15000,e:"Madhu M N",s:"Active",dr:"",ba:"",pm:"Not Confirmed"},
+  {d:"25-Apr-26",b:"11 NEET INT",f:145000,bk:79750,p:25500,e:"Vidhya G.S",s:"Active",dr:"",ba:"",pm:"JODO"},
+  {d:"30-Apr-26",b:"11 JEE INT",f:145000,bk:79750,p:25500,e:"Iranna Ambannavar",s:"Active",dr:"",ba:"",pm:"JODO"},
+  {d:"3-May-26",b:"11 JEE INT",f:145000,bk:79750,p:25500,e:"Vidhya G.S",s:"Active",dr:"",ba:"",pm:"JODO"},
+  {d:"5-May-26",b:"11 NEET INT",f:145000,bk:79750,p:79750,e:"Prajwal A S",s:"Active",dr:"",ba:"",pm:"Not Confirmed"},
+  {d:"6-May-26",b:"11 JEE INT",f:145000,bk:79750,p:25500,e:"Iranna Ambannavar",s:"Active",dr:"",ba:"",pm:"JODO"},
+  {d:"7-May-26",b:"11 JEE INT",f:145000,bk:79750,p:79750,e:"Iranna Ambannavar",s:"Active",dr:"",ba:"",pm:"Loan"},
+  {d:"14-May-26",b:"11 NEET INT",f:145000,bk:79750,p:15950,e:"Prajwal A S",s:"Active",dr:"",ba:"",pm:"Not Confirmed"},
+  {d:"15-May-26",b:"11 NEET INT",f:145000,bk:79750,p:15950,e:"Prajwal A S",s:"Active",dr:"",ba:"",pm:"Not Confirmed"},
+  {d:"29-Nov-25",b:"12 NEET INT",f:145000,bk:76850,p:22400,e:"M Yogesh",s:"Active",dr:"",ba:"",pm:"Not Confirmed"},
+  {d:"29-Nov-25",b:"12 JEE INT",f:145000,bk:75400,p:22400,e:"M Yogesh",s:"Active",dr:"",ba:"",pm:"Not Confirmed"},
+  {d:"29-Nov-25",b:"12 NEET INT",f:145000,bk:71050,p:22400,e:"Soni Kumari",s:"Active",dr:"",ba:"",pm:"Not Confirmed"},
+  {d:"1-Dec-25",b:"12 NEET INT",f:145000,bk:71050,p:48820,e:"M Yogesh",s:"Active",dr:"",ba:"",pm:"Not Confirmed"},
+  {d:"3-Dec-25",b:"12 JEE INT",f:145000,bk:55100,p:22400,e:"Rashmi",s:"Active",dr:"",ba:"",pm:"Not Confirmed"},
+  {d:"7-Dec-25",b:"12 JEE INT",f:145000,bk:65250,p:13050,e:"Soni Kumari",s:"Active",dr:"",ba:"",pm:"Not Confirmed"},
+  {d:"9-Dec-25",b:"12 NEET INT",f:145000,bk:70000,p:22400,e:"Vidhya G.S",s:"Active",dr:"",ba:"",pm:"Not Confirmed"},
+  {d:"10-Dec-25",b:"12 JEE INT",f:145000,bk:65250,p:32400,e:"Vidhya G.S",s:"Active",dr:"",ba:"",pm:"Not Confirmed"},
+  {d:"10-Dec-25",b:"12 JEE INT",f:145000,bk:70325,p:70325,e:"Santhosh Kumar M N",s:"Active",dr:"",ba:"",pm:"Not Confirmed"},
+  {d:"29-Dec-25",b:"12 JEE INT",f:145000,bk:80000,p:80000,e:"Vidhya G.S",s:"Active",dr:"",ba:"",pm:"Full Payment"},
+  {d:"29-Nov-25",b:"12 JEE INT",f:145000,bk:75000,p:43440,e:"Soni Kumari",s:"Active",dr:"",ba:"",pm:"Not Confirmed"},
+  {d:"31-Dec-25",b:"12 JEE INT",f:145000,bk:70000,p:5831,e:"Vidhya G.S",s:"Active",dr:"",ba:"",pm:"Not Confirmed"},
+  {d:"6-Jan-26",b:"12 JEE INT",f:145000,bk:65000,p:25500,e:"M Yogesh",s:"Active",dr:"",ba:"",pm:"Not Confirmed"},
+  {d:"15-Feb-26",b:"12 NEET INT",f:145000,bk:65000,p:30416,e:"Iranna Ambannavar",s:"Active",dr:"",ba:"",pm:"Not Confirmed"},
+  {d:"28-Feb-26",b:"12 NEET INT",f:145000,bk:72500,p:72500,e:"Iranna Ambannavar",s:"Active",dr:"",ba:"",pm:"Not Confirmed"},
+  {d:"5-Mar-26",b:"12 NEET INT",f:145000,bk:85000,p:85000,e:"Madhu M N",s:"Active",dr:"",ba:"",pm:"Not Confirmed"},
+  {d:"11-Mar-26",b:"12 JEE INT",f:145000,bk:68000,p:42500,e:"Vidhya G.S",s:"Active",dr:"",ba:"",pm:"JODO"},
+  {d:"15-Mar-26",b:"12 JEE INT",f:145000,bk:77000,p:77000,e:"Prajwal A S",s:"Active",dr:"",ba:"",pm:"Loan"},
+  {d:"31-Mar-26",b:"12 NEET INT",f:145000,bk:50000,p:50000,e:"Iranna Ambannavar",s:"Active",dr:"",ba:"",pm:"Not Confirmed"},
+  {d:"5-Apr-26",b:"12 JEE INT",f:145000,bk:72500,p:14500,e:"Vidhya G.S",s:"Active",dr:"",ba:"",pm:"Not Confirmed"},
+  {d:"8-Apr-26",b:"12 JEE INT",f:145000,bk:72500,p:14500,e:"Vidhya G.S",s:"Dropout",dr:"Academic Issues",ba:"ABC",pm:"Not Confirmed"},
+  {d:"15-Apr-26",b:"12 NEET INT",f:145000,bk:72500,p:72500,e:"Iranna Ambannavar",s:"Active",dr:"",ba:"",pm:"Loan"},
+  {d:"21-Apr-26",b:"12 NEET INT",f:145000,bk:79750,p:15950,e:"Priya S",s:"Active",dr:"",ba:"",pm:"Not Confirmed"},
+  {d:"11-May-26",b:"12 NEET INT",f:145000,bk:79750,p:25500,e:"Prajwal A S",s:"Active",dr:"",ba:"",pm:"JODO"},
+  {d:"28-Apr-26",b:"LTM",f:145000,bk:79750,p:25500,e:"Iranna Ambannavar",s:"Active",dr:"",ba:"",pm:"JODO"},
+  {d:"29-Apr-26",b:"LTM",f:145000,bk:79750,p:25500,e:"Vidhya G.S",s:"Active",dr:"",ba:"",pm:"JODO"},
+  {d:"30-Apr-26",b:"LTM",f:145000,bk:79750,p:15950,e:"Iranna Ambannavar",s:"Active",dr:"",ba:"",pm:"Not Confirmed"},
+  {d:"7-May-26",b:"LTM",f:145000,bk:79750,p:15950,e:"Prajwal A S",s:"Active",dr:"",ba:"",pm:"Not Confirmed"},
+  {d:"8-May-26",b:"LTM",f:145000,bk:79750,p:25500,e:"Iranna Ambannavar",s:"Active",dr:"",ba:"",pm:"JODO"},
+];
+const SMAPS={Foundation:["8 CBSE","8 ICSE","9 CBSE","9 ICSE","10 CBSE","10 ICSE"],JEE:["11 JEE INT","11 JEE WD","11 JEE WE","12 JEE INT","12 JEE WD","12 JEE WE","LTE"],NEET:["11 NEET INT","11 NEET WD","11 NEET WE","12 NEET INT","12 NEET WD","12 NEET WE","LTM"],KCET:["11 KCET","12 KCET"]};
+const GMAPS={"8th":["8 CBSE","8 ICSE"],"9th":["9 CBSE","9 ICSE"],"10th":["10 CBSE","10 ICSE"],"11th":["11 JEE INT","11 JEE WD","11 JEE WE","11 NEET INT","11 NEET WD","11 NEET WE","11 KCET"],"12th":["12 JEE INT","12 JEE WD","12 JEE WE","12 NEET INT","12 NEET WD","12 NEET WE","12 KCET"],"LTM":["LTM"],"LTE":["LTE"]};
+const ALL_BATCHES=["8 CBSE","9 CBSE","10 CBSE WD","10 CBSE WE","8 ICSE","9 ICSE","10 ICSE","11 JEE INT","11 JEE WD","11 JEE WE","11 NEET INT","11 NEET WD","11 NEET WE","12 JEE INT","12 JEE WD","12 JEE WE","12 NEET INT","12 NEET WD","12 NEET WE","11 KCET","12 KCET","LTM","LTE"];
+const DRS=["Academic Issues","Batch Timing Issue","False Commitments","Distance Issue","Monetary Issue","Not Interested","Others"];
+const PMS=["JODO","Loan","Full Payment","Not Confirmed"];
+const COLS=["#01354D","#EE1C23","#FFC10E","#1F7BB2","#0B6291","#B8870A","#D4181F","#024E72","#6B21A8","#059669"];
+const BKDATA=[{g:"8th",mrp:90000,asp:45450,bk:454500,col:252846,bal:201654},{g:"9th",mrp:90000,asp:42936,bk:1073392,col:541712,bal:531680},{g:"10th",mrp:90000,asp:44050,bk:1638900,col:1015442,bal:623458},{g:"11th",mrp:145000,asp:77036,bk:2601000,col:1330343,bal:1270657},{g:"12th",mrp:145000,asp:71750,bk:1704775,col:931732,bal:773044},{g:"Long Term",mrp:145000,asp:79750,bk:398750,col:108400,bal:290350}];
+const INSDATA=[{g:"8th",i1p:3,i1d:7,i1a:85332,i2p:3,i2d:7,i2a:63999,i3p:3,i3d:7,i3a:63999},{g:"9th",i1p:10,i1d:13,i1a:144825,i2p:10,i2d:13,i2a:108619,i3p:10,i3d:13,i3a:108619},{g:"10th",i1p:18,i1d:20,i1a:238636,i2p:17,i2d:21,i2a:180327,i3p:17,i3d:21,i3a:180327},{g:"11th",i1p:18,i1d:17,i1a:195900,i2p:19,i2d:16,i2a:262575,i3p:19,i3d:16,i3a:262575},{g:"12th",i1p:15,i1d:9,i1a:158660,i2p:13,i2d:11,i2a:155025,i3p:13,i3d:11,i3a:155025},{g:"Long Term",i1p:2,i1d:3,i1a:65100,i2p:2,i2d:3,i2a:48825,i3p:2,i3d:3,i3a:48825}];
+
+function parseM(s){if(!s)return"2025-11";const mn={Jan:"01",Feb:"02",Mar:"03",Apr:"04",May:"05",Jun:"06",Jul:"07",Aug:"08",Sep:"09",Oct:"10",Nov:"11",Dec:"12"};const m=s.match(/^(\d{1,2})-([A-Za-z]{3})-(\d{2,4})$/);if(m){const y=m[3].length===2?"20"+m[3]:m[3];return`${y}-${mn[m[2]]||"01"}`;}return"2025-11";}
+function fL(n){if(n>=10000000)return"₹"+(n/10000000).toFixed(1)+"Cr";if(n>=100000)return"₹"+(n/100000).toFixed(1)+"L";if(n>=1000)return"₹"+(n/1000).toFixed(0)+"K";return"₹"+n;}
+function fM(m){const[y,mo]=m.split("-");return["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"][+mo-1]+"'"+ y.slice(2);}
+function getMths(){const s=new Date("2025-11-01"),now=new Date(),ms=[];let c=new Date(s);while(c<=now){ms.push(`${c.getFullYear()}-${String(c.getMonth()+1).padStart(2,"0")}`);c.setMonth(c.getMonth()+1);}return ms;}
+
+function buildD(recs){
+  const tot=recs.length,drs=recs.filter(r=>r.s==="Dropout"),act=tot-drs.length;
+  const bm={},mm={},em={},rm={},pm2={};
+  DRS.forEach(d=>rm[d]=0);PMS.forEach(p=>pm2[p]=0);
+  recs.forEach(r=>{
+    if(!bm[r.b])bm[r.b]={t:0,d:0,rev:0,bk:0,mrp:0};
+    bm[r.b].t++;bm[r.b].rev+=r.p||0;bm[r.b].bk+=r.bk||0;bm[r.b].mrp+=r.f||0;
+    if(r.s==="Dropout"){bm[r.b].d++;if(rm[r.dr]!==undefined)rm[r.dr]++;else rm["Others"]++;}
+    const mo=parseM(r.d);if(!mm[mo])mm[mo]={t:0,rev:0};mm[mo].t++;mm[mo].rev+=r.p||0;
+    const e=r.e||"Unknown";if(!em[e])em[e]={t:0,d:0,rev:0,bk:0,mrp:0};
+    em[e].t++;em[e].rev+=r.p||0;em[e].bk+=r.bk||0;em[e].mrp+=r.f||0;
+    if(r.s==="Dropout")em[e].d++;
+    const p2=r.pm||"Not Confirmed";if(pm2[p2]!==undefined)pm2[p2]++;else pm2["Not Confirmed"]++;
+  });
+  const bbc=drs.filter(r=>r.ba==="BBC").length,abc=drs.filter(r=>r.ba==="ABC").length;
+  return{recs,tot,act,drs:drs.length,bm,mm,em,rm,bbc,abc,pm:pm2,rev:recs.reduce((s,r)=>s+(r.p||0),0)};
+}
+
+let D=buildD(RECS);
+let CH={};
+let distV="stream",dropStage="all",dropGroupV="stream",dropGroupSel="All",batchSF="all",trendBatch="All Batches",empView="count",accPMview="overall";
+</script>
+
+<div class="app">
+  <!-- LOGO BAR -->
+  <div class="lbar">
+    <img class="lbar-logo" src="https://res.cloudinary.com/dlzbkxczs/image/upload/q_auto/f_auto/v1779115725/New_SCA_IL_2026_wbg_lumx3l.png" alt="Sri Chaitanya Academy" onerror="this.style.display='none'">
+    <div class="lbar-sep"></div>
+    <div class="lbar-info">
+      <div class="lbar-branch">Centre Dashboard &amp; KPIs</div>
+      <div class="lbar-sub">Sri Chaitanya Academy · Jayanagar · AY 2026–27</div>
+    </div>
+    <div class="lbar-right">
+      <div class="lbar-clk" id="clk">--:--:--</div>
+      <button class="ib" id="thbtn" onclick="toggleTheme()"></button>
+    </div>
+  </div>
+
+  <div class="body-row">
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+      <nav class="sb-nav" id="sbnav"></nav>
+      <div class="sb-foot">
+        <div class="sb-user">
+          <div class="sb-av">CH</div>
+          <div><div class="sb-un">Centre Head</div><div class="sb-ur">Jayanagar</div></div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- CONTENT -->
+    <div class="cnt" id="cnt">
+
+      <!-- ADMISSIONS -->
+      <div id="s-adm" class="sec on">
+        <div class="phd">
+          <div class="phd-ico bin" id="phd-adm"></div>
+          <div><div class="phd-title">Admission Data</div><div class="phd-sub">AY 2026–27 · Sri Chaitanya Academy – Jayanagar</div></div>
+        </div>
+        <div class="krow" id="krow"></div>
+        <div class="gstrip" id="gstrip"></div>
+        <div class="g12" style="margin-bottom:16px">
+          <div class="blk" style="margin-bottom:0">
+            <div class="bh">
+              <div class="bhl"><div class="bico bin" id="bico-dist"></div><div><div class="bt">Admissions Distribution</div></div></div>
+              <div class="pt"><button class="pb on" onclick="setDist('stream',this)">Stream</button><button class="pb" onclick="setDist('grade',this)">Grade</button></div>
+            </div>
+            <div class="bb"><div style="height:230px"><canvas id="ch-dn"></canvas></div></div>
+          </div>
+          <div class="blk" style="margin-bottom:0">
+            <div class="bh"><div class="bhl"><div class="bico bin" id="bico-stream"></div><div><div class="bt">Stream Summary</div></div></div></div>
+            <div class="bb" id="sstats"></div>
+          </div>
+        </div>
+        <div class="blk">
+          <div class="bh"><div class="bhl"><div class="bico bin" id="bico-tbl"></div><div><div class="bt">Batch-wise Admissions</div></div></div></div>
+          <div class="fb"><div class="fb-lbl">Stream</div><div class="fp" id="bsf-fp"></div></div>
+          <div class="bb" style="padding:0"><div class="tw" style="max-height:320px;overflow-y:auto"><table><thead><tr><th>Batch</th><th class="r">Admitted</th><th class="r">Dropouts</th><th class="r">Active</th><th class="r">Retention</th><th style="min-width:90px">Progress</th><th>Status</th></tr></thead><tbody id="btbody"></tbody></table></div></div>
+        </div>
+        <div class="blk">
+          <div class="bh"><div class="bhl"><div class="bico bir" id="bico-drop"></div><div><div class="bt">Dropout Analysis</div></div></div></div>
+          <div class="fb">
+            <div class="fb-lbl">Stage</div>
+            <div class="pt"><button class="pb on" onclick="dropStage='all';setPOn(this);rDrop()">All</button><button class="pb" onclick="dropStage='BBC';setPOn(this);rDrop()">BBC – Before Batch</button><button class="pb" onclick="dropStage='ABC';setPOn(this);rDrop()">ABC – After Batch</button></div>
+          </div>
+          <div class="bb">
+            <div class="dkr" id="dkpis"></div>
+            <div class="g2" style="margin-bottom:16px">
+              <div style="height:190px"><canvas id="ch-tm"></canvas></div>
+              <div style="height:190px"><canvas id="ch-dg"></canvas></div>
+            </div>
+            <div class="fb" style="margin-bottom:10px;border-radius:8px;border:1px solid var(--bd)">
+              <div class="fb-lbl">View by</div>
+              <div class="pt"><button class="pb on" onclick="dropGroupV='stream';setPOn(this);buildDropGroupPills();rDropGroup()">Stream-wise</button><button class="pb" onclick="dropGroupV='batch';setPOn(this);buildDropGroupPills();rDropGroup()">Batch-wise</button></div>
+              <div class="fb-sep"></div>
+              <div class="fp" id="dg-pills"></div>
+            </div>
+            <div style="height:200px;margin-bottom:16px"><canvas id="ch-dgb"></canvas></div>
+            <div style="border-top:1px solid var(--bd);padding-top:14px">
+              <div style="font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--tm);margin-bottom:10px">Dropout Reasons</div>
+              <div style="height:190px"><canvas id="ch-rs"></canvas></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SALES -->
+      <div id="s-sales" class="sec">
+        <div class="phd">
+          <div class="phd-ico bir" id="phd-sales"></div>
+          <div><div class="phd-title">Sales</div><div class="phd-sub">Admission trend analysis and counselor performance</div></div>
+        </div>
+        <div class="blk">
+          <div class="bh"><div class="bhl"><div class="bico bin" id="bico-tr"></div><div><div class="bt">Admission Trend</div><div class="bsub">Monthly admissions</div></div></div></div>
+          <div class="fb"><div class="fb-lbl">Batch Group</div><div class="fp" id="tr-fp"></div></div>
+          <div class="bb" style="height:260px"><canvas id="ch-tr"></canvas></div>
+        </div>
+        <div class="blk">
+          <div class="bh">
+            <div class="bhl"><div class="bico bin" id="bico-emp"></div><div><div class="bt">Counselor Performance</div></div></div>
+            <div class="pt"><button class="pb on" onclick="empView='count';setPOn(this);rEmpCards()">Count View</button><button class="pb" onclick="empView='revenue';setPOn(this);rEmpCards()">Revenue View</button></div>
+          </div>
+          <div class="bb" id="emp-cards"></div>
+        </div>
+      </div>
+
+      <!-- ACADEMICS -->
+      <div id="s-acad" class="sec">
+        <div class="phd">
+          <div class="phd-ico" style="background:linear-gradient(135deg,#E8F2FA,#BFDBFE);color:#1F7BB2" id="phd-acad"></div>
+          <div><div class="phd-title">Academics</div><div class="phd-sub">Select a module to view academic reports and data</div></div>
+        </div>
+        <div id="acad-cards"></div>
+      </div>
+
+      <!-- ACCOUNTS -->
+      <div id="s-acc" class="sec">
+        <div class="phd">
+          <div class="phd-ico biy" id="phd-acc"></div>
+          <div><div class="phd-title">Accounts</div><div class="phd-sub">Revenue, installments and payment mode analysis</div></div>
+        </div>
+        <div class="blk">
+          <div class="bh"><div class="bhl"><div class="bico biy" id="bico-rev"></div><div><div class="bt">Booking &amp; Revenue Overview</div><div class="bsub">MRP vs ASP vs Collection by grade</div></div></div></div>
+          <div class="bb">
+            <div id="rkpis" style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px"></div>
+            <div style="height:180px;margin-bottom:14px"><canvas id="ch-rv"></canvas></div>
+            <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--tm);margin-bottom:8px;padding-top:10px;border-top:1px solid var(--bd)">Grade-wise Detail</div>
+            <div class="tw"><table><thead><tr><th>Grade</th><th class="r">MRP</th><th class="r">ASP</th><th class="r">Discount</th><th class="r">Booked</th><th class="r">Collected</th><th style="min-width:100px">Collection %</th><th class="r">Balance</th></tr></thead><tbody id="rtbody"></tbody></table></div>
+          </div>
+        </div>
+        <div class="blk">
+          <div class="bh"><div class="bhl"><div class="bico biy" id="bico-ins"></div><div><div class="bt">Installment Dues</div></div></div></div>
+          <div class="bb">
+            <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px" id="ins-kpis"></div>
+            <div class="tw"><table class="ins-tbl"><thead><tr><th rowspan="2">Grade</th><th colspan="3" style="text-align:center;border-left:2px solid var(--bd);border-right:2px solid var(--bd);color:#01354D;background:#F2F6F9">Installment 1</th><th colspan="3" style="text-align:center;border-right:2px solid var(--bd);color:#B8870A;background:#FFFAE8">Installment 2</th><th colspan="3" style="text-align:center;color:#EE1C23;background:#FEF3F3">Installment 3</th></tr><tr><th style="border-left:2px solid var(--bd)">Paid</th><th>Due Nos.</th><th style="border-right:2px solid var(--bd)">Due Amt</th><th>Paid</th><th>Due Nos.</th><th style="border-right:2px solid var(--bd)">Due Amt</th><th>Paid</th><th>Due Nos.</th><th>Due Amt</th></tr></thead><tbody id="ins-tbody"></tbody></table></div>
+          </div>
+        </div>
+        <div class="blk">
+          <div class="bh">
+            <div class="bhl"><div class="bico biy" id="bico-pm"></div><div><div class="bt">Payment Mode Analysis</div></div></div>
+            <div class="pt"><button class="pb on" onclick="accPMview='overall';setPOn(this);rPayAcc()">Overall</button><button class="pb" onclick="accPMview='emp';setPOn(this);rPayAcc()">By Counselor</button></div>
+          </div>
+          <div class="bb">
+            <div class="g21"><div style="height:200px"><canvas id="ch-py"></canvas></div><div id="pydet"></div></div>
+            <div id="pay-emp-view"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- OPERATIONS -->
+      <div id="s-ops" class="sec">
+        <div class="phd">
+          <div class="phd-ico" style="background:linear-gradient(135deg,#F3E8FF,#DDD6FE);color:#6B21A8" id="phd-ops"></div>
+          <div><div class="phd-title">Operations</div><div class="phd-sub">Fee defaulters, operational issues and petty cash management</div></div>
+        </div>
+        <div id="ops-cards"></div>
+      </div>
+
+      <!-- REV VS EXP -->
+      <div id="s-revexp" class="sec">
+        <div class="phd">
+          <div class="phd-ico bigr" id="phd-re"></div>
+          <div><div class="phd-title">Revenue vs Expense</div><div class="phd-sub">Branch P&amp;L overview · AY 2026–27</div></div>
+        </div>
+        <div id="revexp-content"></div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+// ── CHART DEFAULTS ──
+function isDk(){return document.documentElement.getAttribute("data-theme")==="dark";}
+function bo(ex={}){
+  const d=isDk();
+  return{responsive:true,maintainAspectRatio:false,
+    plugins:{legend:{display:false,...(ex.lg||{})},
+      tooltip:{backgroundColor:d?"#071827":"#fff",borderColor:d?"rgba(255,255,255,.12)":"#DDE4EF",borderWidth:1,titleColor:d?"#E8F2FA":"#0A1929",bodyColor:d?"#8AAFC8":"#3D5166",padding:10,cornerRadius:9,titleFont:{family:"Inter",size:12,weight:"700"},bodyFont:{family:"Inter",size:12}}},
+    scales:ex.ns?{}:{
+      x:{grid:{display:false},ticks:{color:"#7A8FA6",font:{family:"Inter",size:11}},border:{display:false}},
+      y:{grid:{color:d?"rgba(255,255,255,.04)":"rgba(221,228,239,.8)"},ticks:{color:"#7A8FA6",font:{family:"Inter",size:11},padding:5},border:{display:false}}
+    }};
+}
+function lgOpts(d){return{display:true,position:"bottom",labels:{color:isDk()?"#8AAFC8":"#3D5166",font:{size:11,family:"Inter"},usePointStyle:true,pointStyleWidth:9,padding:14}};}
+function dc(k){if(CH[k]){CH[k].destroy();delete CH[k];}}
+function setPOn(b){b.closest(".pt").querySelectorAll(".pb").forEach(x=>x.classList.remove("on"));b.classList.add("on");}
+function setFPOn(b,g){document.querySelectorAll(`[data-fpg="${g}"]`).forEach(x=>x.classList.remove("on"));b.classList.add("on");}
+
+// ── SIDEBAR ──
+const NAV=[
+  {s:"adm",ik:"dash",l:"Admission Data",g:"Dashboards"},
+  {s:"sales",ik:"trend",l:"Sales",g:"Dashboards"},
+  {s:"acad",ik:"school",l:"Academics",g:"Management"},
+  {s:"acc",ik:"coin",l:"Accounts",g:"Management"},
+  {s:"ops",ik:"gear",l:"Operations",g:"Management"},
+  {s:"revexp",ik:"revexp",l:"Revenue vs Expense",g:"Analytics"},
+];
+function buildSidebar(){
+  const nav=document.getElementById("sbnav");let html="",lg="";
+  NAV.forEach(n=>{
+    if(n.g!==lg){html+=`<div class="sb-sec">${n.g}</div>`;lg=n.g;}
+    html+=`<button class="ni${n.s==='adm'?' active':''}" data-sec="${n.s}" onclick="navTo('${n.s}')"><span class="ni-ico">${ico(n.ik)}</span><span>${n.l}</span></button>`;
+  });
+  nav.innerHTML=html;
+}
+function navTo(sec){
+  document.querySelectorAll(".ni").forEach(b=>b.classList.remove("active"));
+  document.querySelector(`[data-sec="${sec}"]`).classList.add("active");
+  document.querySelectorAll(".sec").forEach(s=>s.classList.remove("on"));
+  document.getElementById("s-"+sec).classList.add("on");
+  if(sec==="sales"){initTrendFilters();rTrend();rEmpCards();}
+  if(sec==="acad")buildAcad();
+  if(sec==="ops")buildOps();
+  if(sec==="revexp")buildRevExp();
+}
+
+// ── SET INLINE ICONS ──
+function setIcons(){
+  const map={
+    "phd-adm":"dash","phd-sales":"trend","phd-acad":"school","phd-acc":"coin","phd-ops":"gear","phd-re":"revexp",
+    "bico-dist":"pie","bico-stream":"bar","bico-tbl":"tbl","bico-drop":"uminus",
+    "bico-tr":"trend","bico-emp":"ucheck","bico-rev":"coin","bico-ins":"list","bico-pm":"card",
+  };
+  Object.entries(map).forEach(([id,k])=>{const el=document.getElementById(id);if(el)el.innerHTML=ico(k);});
+  // topbar theme btn
+  document.getElementById("thbtn").innerHTML=ico("moon");
+}
+
+// ── THEME ──
+function toggleTheme(){
+  const d=isDk();document.documentElement.setAttribute("data-theme",d?"":"dark");
+  document.getElementById("thbtn").innerHTML=d?ico("moon"):ico("sun");
+  rAll();
+}
+setInterval(()=>{document.getElementById("clk").textContent=new Date().toLocaleTimeString("en-IN",{hour:"2-digit",minute:"2-digit",second:"2-digit",hour12:true});},1000);
+
+// ── RENDER ALL ──
+function rAll(){rKPI();rGStrip();rDonut();rStream();rBatch();rDKPIs();buildDropGroupPills();rDrop();rRevKPIs();rRevChart();rRevTable();rInstall();rPayAcc();}
+
+// ── KPI ──
+function rKPI(){
+  const{tot,act,drs}=D,ret=tot?Math.round(act/tot*100):0,dr=tot?Math.round(drs/tot*100):0;
+  document.getElementById("krow").innerHTML=`
+    <div class="kc kc-navy">
+      <div class="kc-top"><div class="ki ki-w">${ico("users")}</div><span class="kbg kbg-w">AY 2026-27</span></div>
+      <div class="klbl" style="opacity:.75">Total Admissions</div>
+      <div class="kval">${tot}</div>
+      <div class="kpb kpb-dark"><div class="kpb-f" style="width:100%;background:rgba(255,255,255,.45)"></div></div>
+      <div class="kft" style="opacity:.85;font-size:10.5px">All students<span>Jayanagar</span></div>
+    </div>
+    <div class="kc kc-light">
+      <div class="kc-top"><div class="ki ki-n">${ico("ucheck")}</div><span class="kbg kbg-n">${ret}% retained</span></div>
+      <div class="klbl" style="color:var(--ts)">Active Strength</div>
+      <div class="kval" style="color:var(--tp)">${act}</div>
+      <div class="kpb kpb-light"><div class="kpb-f" style="width:${ret}%;background:#01354D"></div></div>
+      <div class="kft" style="color:var(--ts);font-size:10.5px">${ret}% retention<span style="color:var(--tm)">Currently enrolled</span></div>
+    </div>
+    <div class="kc kc-red">
+      <div class="kc-top"><div class="ki ki-w">${ico("uminus")}</div><span class="kbg kbg-w">${dr}% rate</span></div>
+      <div class="klbl" style="opacity:.75">Total Dropouts</div>
+      <div class="kval">${drs}</div>
+      <div class="kpb kpb-dark"><div class="kpb-f" style="width:${Math.min(dr*5,100)}%;background:rgba(255,255,255,.4)"></div></div>
+      <div class="kft" style="opacity:.85;font-size:10.5px">${dr}% dropout rate<span>See analysis</span></div>
+    </div>`;
+}
+
+// ── STRIP ──
+function rGStrip(){
+  const sc=["#01354D","#EE1C23","#1F7BB2","#B8870A"];
+  const streams=Object.entries(SMAPS).map(([n,bs])=>({n,t:bs.reduce((s,b)=>s+(D.bm[b]||{t:0}).t,0)})).filter(x=>x.t>0);
+  document.getElementById("gstrip").innerHTML=streams.map((s,i)=>`<div class="gs" style="border-top-color:${sc[i]}"><div class="gs-v" style="color:${sc[i]}">${s.t}</div><div class="gs-l">${s.n}</div></div>`).join('');
+}
+
+// ── DONUT ──
+function setDist(v,btn){distV=v;setPOn(btn);rDonut();}
+function rDonut(){
+  dc("dn");
+  let lb=[],vs=[];
+  const map=distV==="stream"?SMAPS:GMAPS;
+  Object.entries(map).forEach(([n,bs])=>{const t=bs.reduce((s,b)=>s+(D.bm[b]||{t:0}).t,0);if(t>0){lb.push(n);vs.push(t);}});
+  const cols=COLS.slice(0,lb.length),tot=vs.reduce((a,b)=>a+b,0);
+  CH["dn"]=new Chart(document.getElementById("ch-dn"),{
+    type:"doughnut",
+    data:{labels:lb.map((l,i)=>`${l} — ${vs[i]} (${Math.round(vs[i]/tot*100)}%)`),datasets:[{data:vs,backgroundColor:cols,borderWidth:2,borderColor:"var(--su)",hoverOffset:6}]},
+    options:{...bo({ns:true}),cutout:"60%",plugins:{
+      legend:lgOpts(),
+      tooltip:{...bo().plugins.tooltip,callbacks:{label:c=>`${vs[c.dataIndex]} students — ${Math.round(vs[c.dataIndex]/tot*100)}%`}}
+    }}
+  });
+}
+
+// ── STREAM STATS ──
+function rStream(){
+  const e=Object.entries(SMAPS).map(([n,bs],i)=>{const t=bs.reduce((s,b)=>s+(D.bm[b]||{t:0}).t,0),d=bs.reduce((s,b)=>s+(D.bm[b]||{d:0}).d,0);return{n,t,d,ret:t?Math.round((t-d)/t*100):0,c:COLS[i]};}).filter(x=>x.t>0);
+  document.getElementById("sstats").innerHTML=e.map(s=>`
+    <div class="sc">
+      <div class="sc-row"><span style="display:flex;align-items:center;gap:6px"><span style="width:10px;height:10px;border-radius:50%;background:${s.c};flex-shrink:0"></span><b style="font-size:12.5px;color:${s.c}">${s.n}</b></span><span class="ch ${s.ret>=80?'cg':s.ret>=50?'ca':'cr'}">${s.ret}%</span></div>
+      <div class="sc-pb"><div class="sc-pf" style="width:${s.ret}%;background:${s.c}"></div></div>
+      <div class="sc-nums"><span><b style="font-family:var(--fm)">${s.t}</b> admitted</span><span style="color:#EE1C23"><b style="font-family:var(--fm)">${s.d}</b> dropped</span><span><b style="font-family:var(--fm)">${s.t-s.d}</b> active</span></div>
+    </div>`).join('');
+}
+
+// ── BATCH TABLE ──
+function initBatchFilters(){
+  const fp=document.getElementById("bsf-fp");
+  ['All','Foundation','JEE','NEET'].forEach((v,i)=>{
+    const b=document.createElement("button");b.className="fpb"+(i===0?" on":"");b.dataset.fpg="bsf";b.dataset.v=i===0?"all":v;b.textContent=v;
+    b.onclick=()=>{setFPOn(b,"bsf");batchSF=b.dataset.v;rBatch();};fp.appendChild(b);
+  });
+}
+function rBatch(){
+  const allowed=batchSF==="all"?null:SMAPS[batchSF];
+  const order=["8 CBSE","8 ICSE","9 CBSE","9 ICSE","10 CBSE","10 ICSE","11 JEE INT","11 NEET INT","12 JEE INT","12 NEET INT","LTM","LTE"];
+  const bats=Object.keys(D.bm).filter(b=>!allowed||allowed.includes(b)).sort((a,b)=>(order.indexOf(a)<0?99:order.indexOf(a))-(order.indexOf(b)<0?99:order.indexOf(b)));
+  let h="",tT=0,tD=0,tA=0;
+  bats.forEach(b=>{
+    const bd=D.bm[b],ac=bd.t-bd.d,ret=bd.t?Math.round(ac/bd.t*100):0;
+    const rc=ret>=80?"rg":ret>=50?"ra":"rr",cc=ret>=80?"cg":ret>=50?"ca":"cr";
+    const fc=ret>=80?"#01354D":ret>=50?"#FFC10E":"#EE1C23";
+    tT+=bd.t;tD+=bd.d;tA+=ac;
+    h+=`<tr class="${rc}"><td style="font-weight:600">${b}</td><td class="r num">${bd.t}</td><td class="r num">${bd.d}</td><td class="r num">${ac}</td><td class="r num">${ret}%</td><td><div class="mbc"><div class="mbg"><div class="mbf" style="width:${ret}%;background:${fc}"></div></div><span style="font-size:10px;font-family:var(--fm);color:${fc};min-width:26px">${ret}%</span></div></td><td><span class="ch ${cc}">${ret>=80?"Good":ret>=50?"Watch":"Critical"}</span></td></tr>`;
+  });
+  const tR=tT?Math.round(tA/tT*100):0;
+  h+=`<tr class="tot"><td>TOTAL</td><td class="r num">${tT}</td><td class="r num">${tD}</td><td class="r num">${tA}</td><td class="r num">${tR}%</td><td></td><td></td></tr>`;
+  document.getElementById("btbody").innerHTML=h;
+}
+
+// ── DROPOUT KPIs ──
+function rDKPIs(){
+  const{drs,bbc,abc}=D,top=Object.entries(D.rm).filter(x=>x[1]>0).sort((a,b)=>b[1]-a[1])[0]||["None",0];
+  document.getElementById("dkpis").innerHTML=`
+    <div class="dk" style="background:var(--r50);border-color:var(--r100)"><div style="font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:#B0151B;margin-bottom:3px">Total Dropouts</div><div style="font-family:var(--fm);font-size:28px;font-weight:700;color:#EE1C23">${drs}</div></div>
+    <div class="dk" style="background:var(--n50);border-color:var(--n100)"><div style="font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:#01354D;margin-bottom:3px">BBC · Before Batch</div><div style="font-family:var(--fm);font-size:28px;font-weight:700;color:#01354D">${bbc}</div><div style="font-size:10.5px;color:var(--tm);margin-top:3px">${drs?Math.round(bbc/drs*100):0}% of total</div></div>
+    <div class="dk" style="background:var(--y50);border-color:var(--y100)"><div style="font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:#B8870A;margin-bottom:3px">ABC · After Batch</div><div style="font-family:var(--fm);font-size:28px;font-weight:700;color:#B8870A">${abc}</div><div style="font-size:10.5px;color:var(--tm);margin-top:3px">${drs?Math.round(abc/drs*100):0}% of total</div></div>`;
+}
+
+// ── DROPOUT CHARTS ──
+function rDrop(){
+  dc("tm");
+  let fd=D.recs.filter(r=>r.s==="Dropout");
+  if(dropStage==="BBC")fd=fd.filter(r=>r.ba==="BBC");
+  else if(dropStage==="ABC")fd=fd.filter(r=>r.ba==="ABC");
+  const bbc=fd.filter(r=>r.ba==="BBC").length,abc=fd.filter(r=>r.ba==="ABC").length;
+  CH["tm"]=new Chart(document.getElementById("ch-tm"),{
+    type:"doughnut",
+    data:{labels:[`BBC — ${bbc}`,`ABC — ${abc}`],datasets:[{data:[bbc,abc],backgroundColor:["#01354D","#EE1C23"],borderWidth:2,borderColor:"var(--su)"}]},
+    options:{...bo({ns:true}),cutout:"58%",plugins:{legend:lgOpts(),tooltip:{...bo().plugins.tooltip,callbacks:{label:c=>`${c.label.split(' — ')[0]}: ${[bbc,abc][c.dataIndex]} students`}}}}
+  });
+  buildDropGroupPills();
+  rDropGroup(fd);
+  rDropReasons(fd);
+}
+
+function buildDropGroupPills(){
+  const fp=document.getElementById("dg-pills");fp.innerHTML='';
+  const opts=dropGroupV==="stream"?["All",...Object.keys(SMAPS)]:["All",...ALL_BATCHES];
+  opts.slice(0,dropGroupV==="stream"?5:24).forEach((v,i)=>{
+    const b=document.createElement("button");b.className="fpb"+(i===0?" on":"");b.dataset.fpg="dg";b.textContent=v;
+    b.onclick=()=>{setFPOn(b,"dg");dropGroupSel=v;rDropGroup();};fp.appendChild(b);
+  });
+  dropGroupSel="All";
+}
+
+function rDropGroup(fd2){
+  dc("dg");dc("dgb");
+  let fd=fd2||(()=>{let f=D.recs.filter(r=>r.s==="Dropout");if(dropStage==="BBC")f=f.filter(r=>r.ba==="BBC");else if(dropStage==="ABC")f=f.filter(r=>r.ba==="ABC");return f;})();
+
+  // Stage donut already rendered; now render group bar (ch-dgb)
+  let labels=[],actD=[],dropD=[];
+  if(dropGroupV==="stream"){
+    const keys=dropGroupSel==="All"?Object.keys(SMAPS):[dropGroupSel];
+    keys.forEach(n=>{if(!SMAPS[n])return;const t=SMAPS[n].reduce((s,b)=>s+(D.bm[b]||{t:0}).t,0),d=fd.filter(r=>SMAPS[n].includes(r.b)).length;labels.push(n);actD.push(t-d);dropD.push(d);});
+  } else {
+    const bats=dropGroupSel==="All"?ALL_BATCHES:[dropGroupSel];
+    bats.forEach(b=>{if(!D.bm[b])return;labels.push(b);actD.push(D.bm[b].t-D.bm[b].d);dropD.push(fd.filter(r=>r.b===b).length);});
+  }
+  CH["dgb"]=new Chart(document.getElementById("ch-dgb"),{
+    type:"bar",
+    data:{labels,datasets:[
+      {label:`Active — ${actD.reduce((a,b)=>a+b,0)}`,data:actD,backgroundColor:"#01354D",borderRadius:{topLeft:4,topRight:4},maxBarThickness:32},
+      {label:`Dropouts — ${dropD.reduce((a,b)=>a+b,0)}`,data:dropD,backgroundColor:"#EE1C23",borderRadius:{topLeft:4,topRight:4},maxBarThickness:32}
+    ]},
+    options:{...bo(),plugins:{...bo().plugins,legend:{display:true,position:"top",labels:{color:isDk()?"#8AAFC8":"#3D5166",font:{size:11,family:"Inter"},usePointStyle:true,pointStyleWidth:8}}}}
+  });
+}
+
+function rDropReasons(fd){
+  dc("rs");
+  const rm2={};DRS.forEach(d=>rm2[d]=0);fd.forEach(r=>{if(rm2[r.dr]!==undefined)rm2[r.dr]++;else rm2["Others"]++;});
+  const sorted=Object.entries(rm2).filter(x=>x[1]>0).sort((a,b)=>b[1]-a[1]);
+  if(!sorted.length)return;
+  CH["rs"]=new Chart(document.getElementById("ch-rs"),{
+    type:"bar",
+    data:{labels:sorted.map(x=>`${x[0]} (${x[1]})`),datasets:[{data:sorted.map(x=>x[1]),backgroundColor:COLS.slice(0,sorted.length),borderRadius:4,maxBarThickness:20}]},
+    options:{...bo(),indexAxis:"y",scales:{x:{...bo().scales.x,beginAtZero:true,ticks:{...bo().scales.x.ticks,stepSize:1}},y:{...bo().scales.y,grid:{display:false}}}}
+  });
+}
+
+// ── SALES ──
+function initTrendFilters(){
+  const fp=document.getElementById("tr-fp");fp.innerHTML='';
+  ["All Batches","Foundation","11th & 12th","LTM","LTE"].forEach((v,i)=>{
+    const b=document.createElement("button");b.className="fpb"+(i===0?" on":"");b.dataset.fpg="trf";b.textContent=v;
+    b.onclick=()=>{setFPOn(b,"trf");trendBatch=v;rTrend();};fp.appendChild(b);
+  });
+}
+function rTrend(){
+  dc("tr");
+  const months=getMths();
+  const tMap={"All Batches":null,"Foundation":SMAPS.Foundation,"11th & 12th":[...Object.keys(D.bm).filter(b=>b.startsWith("11")||b.startsWith("12"))],"LTM":["LTM"],"LTE":["LTE"]};
+  const allowed=tMap[trendBatch]||null;
+  const recs=allowed?D.recs.filter(r=>allowed.includes(r.b)):D.recs;
+  const labels=[],data=[];
+  months.forEach(m=>{const cnt=recs.filter(r=>parseM(r.d)===m).length;labels.push(fM(m));data.push(cnt);});
+  CH["tr"]=new Chart(document.getElementById("ch-tr"),{
+    type:"bar",
+    data:{labels,datasets:[{label:"Admissions",data,backgroundColor:data.map(v=>v>0?"#01354D":"rgba(1,53,77,.12)"),borderRadius:6,maxBarThickness:36}]},
+    options:{...bo(),plugins:{...bo().plugins,tooltip:{...bo().plugins.tooltip,callbacks:{title:([c])=>c.label,label:c=>`${c.raw} admissions`}}},scales:{...bo().scales,y:{...bo().scales.y,ticks:{...bo().scales.y.ticks,stepSize:1}}}}
+  });
+}
+
+function rEmpCards(){
+  const emps=Object.entries(D.em).filter(([e])=>e!=="Unknown").sort((a,b)=>b[1].t-a[1].t);
+  const html=emps.map(([e,v])=>{
+    const act=v.t-v.d,retPct=v.t?Math.round(act/v.t*100):0,drPct=v.t?Math.round(v.d/v.t*100):0;
+    const discAmt=v.mrp-v.bk,discPct=v.mrp?Math.round(discAmt/v.mrp*100):0,collPct=v.mrp?Math.round(v.rev/v.mrp*100):0;
+    const av=e.split(" ").map(w=>w[0]).join("").slice(0,2).toUpperCase();
+    if(empView==="count"){return`<div class="ec">
+      <div class="ec-top">
+        <div style="display:flex;align-items:center;gap:9px">
+          <div class="ec-av" style="background:linear-gradient(135deg,#01354D,#1F7BB2);color:#fff">${av}</div>
+          <div class="ec-name">${e}</div>
+        </div>
+        <div style="display:flex;gap:6px"><span class="ch cg">${v.t} total</span><span class="ch ${retPct>=80?'cg':retPct>=50?'ca':'cr'}">${retPct}% active</span></div>
+      </div>
+      <div class="ec-row"><span style="font-weight:600;color:#01354D">Active — ${act} students</span><span style="font-family:var(--fm);color:#01354D;font-weight:700">${retPct}%</span></div>
+      <div class="ec-bar-bg"><div class="ec-bar-f" style="width:${retPct}%;background:linear-gradient(90deg,#01354D,#1F7BB2)"></div></div>
+      <div class="ec-row"><span style="font-weight:600;color:#EE1C23">Dropouts — ${v.d} students</span><span style="font-family:var(--fm);color:#EE1C23;font-weight:700">${drPct}%</span></div>
+      <div class="ec-bar-bg"><div class="ec-bar-f" style="width:${drPct}%;background:linear-gradient(90deg,#D4181F,#EE1C23)"></div></div>
+    </div>`;}
+    else{return`<div class="ec">
+      <div class="ec-top">
+        <div style="display:flex;align-items:center;gap:9px">
+          <div class="ec-av" style="background:linear-gradient(135deg,#B8870A,#FFC10E);color:#01354D">${av}</div>
+          <div class="ec-name">${e}</div>
+        </div>
+        <span class="ch ca">Discount: ${discPct}% · ${fL(discAmt)}</span>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:7px;margin-bottom:10px">
+        <div style="text-align:center;padding:8px;background:var(--sb);border-radius:8px;border:1px solid var(--bd)"><div style="font-size:9px;color:var(--tm);font-weight:700;text-transform:uppercase;margin-bottom:2px">MRP Total</div><div style="font-family:var(--fm);font-size:12px;font-weight:700">${fL(v.mrp)}</div></div>
+        <div style="text-align:center;padding:8px;background:var(--n50);border-radius:8px;border:1px solid var(--n100)"><div style="font-size:9px;color:#01354D;font-weight:700;text-transform:uppercase;margin-bottom:2px">Booked (ASP)</div><div style="font-family:var(--fm);font-size:12px;font-weight:700;color:#01354D">${fL(v.bk)}</div></div>
+        <div style="text-align:center;padding:8px;background:var(--y50);border-radius:8px;border:1px solid var(--y100)"><div style="font-size:9px;color:#B8870A;font-weight:700;text-transform:uppercase;margin-bottom:2px">Discount</div><div style="font-family:var(--fm);font-size:12px;font-weight:700;color:#B8870A">${fL(discAmt)}</div></div>
+      </div>
+      <div class="ec-row"><span style="font-weight:600">Collected <b style="font-family:var(--fm);color:#01354D">${fL(v.rev)}</b></span><span style="font-family:var(--fm);font-weight:700;color:#01354D">${collPct}%</span></div>
+      <div class="ec-bar-bg"><div class="ec-bar-f" style="width:${collPct}%;background:linear-gradient(90deg,#01354D,#1F7BB2)"></div></div>
+    </div>`;}
+  }).join('');
+  document.getElementById("emp-cards").innerHTML=`<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:10px">${html}</div>`;
+}
+
+// ── ACADEMICS ──
+function buildAcad(){
+  if(document.getElementById("acad-cards").innerHTML.trim())return;
+  const mods=[
+    {ik:"list",col:"#01354D",bg:"#E6EEF4",title:"Syllabus Compliance",sub:"Track syllabus coverage across batches and subjects"},
+    {ik:"bar",col:"#EE1C23",bg:"#FEF3F3",title:"Test Attendance & Performance",sub:"Test-wise scores, attendance and performance trends"},
+    {ik:"users",col:"#1F7BB2",bg:"#E8F2FA",title:"Classroom Attendance",sub:"Daily and monthly attendance reports per batch"},
+    {ik:"school",col:"#B8870A",bg:"#FFFAE8",title:"PTM Reports",sub:"Parent-Teacher Meeting records and feedback"},
+    {ik:"pie",col:"#0B6291",bg:"#E6EEF4",title:"Feedback Reports",sub:"Student and parent feedback analysis"},
+    {ik:"tbl",col:"#6B21A8",bg:"#F3E8FF",title:"DAR Reports",sub:"Daily Activity Reports – batch-wise academic tracking"},
+    {ik:"list",col:"#059669",bg:"#ECFDF5",title:"Batch Planning / FSR",sub:"Forward Schedule of Revision and batch planning documents"},
+  ];
+  document.getElementById("acad-cards").innerHTML=mods.map((m,i)=>`
+    <div class="ac-card" onclick="toggleAcad(${i})">
+      <div class="ac-hd">
+        <div class="ac-left">
+          <div class="ac-ico" style="background:${m.bg};color:${m.col}">${ico(m.ik)}</div>
+          <div><div class="ac-title">${m.title}</div><div class="ac-sub">${m.sub}</div></div>
+        </div>
+        <span style="color:var(--tm)">${ico("chev")}</span>
+      </div>
+      <div class="ac-body" id="acbd-${i}">
+        <div class="coming">📋 Connect Google Sheets to populate live data for this module.<br><span style="font-size:11px">Data auto-populates from the Academics sheet when Apps Script is deployed.</span></div>
+      </div>
+    </div>`).join('');
+}
+function toggleAcad(i){document.getElementById("acbd-"+i).classList.toggle("open");}
+
+// ── ACCOUNTS ──
+function rRevKPIs(){
+  const bkT=BKDATA.reduce((s,r)=>s+r.bk,0),cT=BKDATA.reduce((s,r)=>s+r.col,0),bT=BKDATA.reduce((s,r)=>s+r.bal,0);
+  document.getElementById("rkpis").innerHTML=`
+    <div style="padding:10px 12px;background:var(--sb);border-radius:9px;border:1px solid var(--bd)"><div style="font-size:9px;font-weight:700;color:var(--tm);text-transform:uppercase;letter-spacing:.07em;margin-bottom:3px">Total Booked</div><div style="font-family:var(--fm);font-size:18px;font-weight:700">${fL(bkT)}</div></div>
+    <div style="padding:10px 12px;background:var(--n50);border-radius:9px;border:1px solid var(--n100)"><div style="font-size:9px;font-weight:700;color:#01354D;text-transform:uppercase;letter-spacing:.07em;margin-bottom:3px">Collected</div><div style="font-family:var(--fm);font-size:18px;font-weight:700;color:#01354D">${fL(cT)}</div></div>
+    <div style="padding:10px 12px;background:var(--r50);border-radius:9px;border:1px solid var(--r100)"><div style="font-size:9px;font-weight:700;color:#B0151B;text-transform:uppercase;letter-spacing:.07em;margin-bottom:3px">Balance Due</div><div style="font-family:var(--fm);font-size:18px;font-weight:700;color:#EE1C23">${fL(bT)}</div></div>`;
+}
+function rRevChart(){
+  dc("rv");
+  CH["rv"]=new Chart(document.getElementById("ch-rv"),{
+    type:"bar",
+    data:{labels:BKDATA.map(r=>r.g),datasets:[
+      {label:"MRP",data:BKDATA.map(r=>r.mrp),backgroundColor:"rgba(1,53,77,.15)",borderRadius:3,maxBarThickness:20},
+      {label:"Booked (ASP)",data:BKDATA.map(r=>r.asp),backgroundColor:"#01354D",borderRadius:3,maxBarThickness:20},
+      {label:"Collected",data:BKDATA.map(r=>r.col/BKDATA.length),backgroundColor:"#1F7BB2",borderRadius:3,maxBarThickness:20},
+    ]},
+    options:{...bo(),plugins:{...bo().plugins,legend:{display:true,position:"top",labels:{color:isDk()?"#8AAFC8":"#3D5166",font:{size:11,family:"Inter"},usePointStyle:true,pointStyleWidth:7}}}}
+  });
+}
+function rRevTable(){
+  let h=BKDATA.map(r=>{const pct=r.bk?Math.round(r.col/r.bk*100):0,fc=pct>=60?"#01354D":pct>=40?"#B8870A":"#EE1C23",disc=r.mrp?Math.round((r.mrp-r.asp)/r.mrp*100):0;
+    return`<tr><td>${r.g}</td><td class="r num">${fL(r.mrp)}</td><td class="r num">${fL(r.asp)}</td><td class="r num" style="color:#B8870A;font-weight:600">${disc}%</td><td class="r num">${fL(r.bk)}</td><td class="r num" style="color:#01354D;font-weight:700">${fL(r.col)}</td><td><div class="mbc"><div class="mbg"><div class="mbf" style="width:${pct}%;background:${fc}"></div></div><span style="font-size:10.5px;font-weight:700;color:${fc};min-width:28px">${pct}%</span></div></td><td class="r num" style="color:#EE1C23">${fL(r.bal)}</td></tr>`;
+  }).join('');
+  const bkT=BKDATA.reduce((s,r)=>s+r.bk,0),cT=BKDATA.reduce((s,r)=>s+r.col,0),bT=BKDATA.reduce((s,r)=>s+r.bal,0),tP=bkT?Math.round(cT/bkT*100):0;
+  h+=`<tr class="tot"><td>TOTAL</td><td></td><td></td><td></td><td class="r num">${fL(bkT)}</td><td class="r num">${fL(cT)}</td><td><div class="mbc"><div class="mbg"><div class="mbf" style="width:${tP}%;background:#01354D"></div></div><b style="font-size:10.5px;min-width:28px">${tP}%</b></div></td><td class="r num">${fL(bT)}</td></tr>`;
+  document.getElementById("rtbody").innerHTML=h;
+}
+function rInstall(){
+  const ti1=INSDATA.reduce((s,r)=>s+r.i1a,0),ti2=INSDATA.reduce((s,r)=>s+r.i2a,0),ti3=INSDATA.reduce((s,r)=>s+r.i3a,0);
+  document.getElementById("ins-kpis").innerHTML=`
+    <div style="padding:10px;background:var(--n50);border-radius:9px;border:1px solid var(--n100);text-align:center"><div style="font-size:9px;font-weight:700;color:#01354D;text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px">I1 Total Due</div><div style="font-family:var(--fm);font-size:17px;font-weight:700;color:#01354D">${fL(ti1)}</div></div>
+    <div style="padding:10px;background:var(--y50);border-radius:9px;border:1px solid var(--y100);text-align:center"><div style="font-size:9px;font-weight:700;color:#B8870A;text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px">I2 Total Due</div><div style="font-family:var(--fm);font-size:17px;font-weight:700;color:#B8870A">${fL(ti2)}</div></div>
+    <div style="padding:10px;background:var(--r50);border-radius:9px;border:1px solid var(--r100);text-align:center"><div style="font-size:9px;font-weight:700;color:#B0151B;text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px">I3 Total Due</div><div style="font-family:var(--fm);font-size:17px;font-weight:700;color:#EE1C23">${fL(ti3)}</div></div>`;
+  let h=INSDATA.map(r=>`<tr><td>${r.g}</td><td class="ig">${r.i1p}</td><td class="ib2">${r.i1d}</td><td style="color:#EE1C23;font-weight:600">${fL(r.i1a)}</td><td class="ig">${r.i2p}</td><td class="ib2">${r.i2d}</td><td style="color:#B8870A;font-weight:600">${fL(r.i2a)}</td><td class="ig">${r.i3p}</td><td class="ib2">${r.i3d}</td><td style="color:#EE1C23;font-weight:600">${fL(r.i3a)}</td></tr>`).join('');
+  const sp=INSDATA.reduce((s,r)=>s+r.i1p,0),sd=INSDATA.reduce((s,r)=>s+r.i1d,0),s2p=INSDATA.reduce((s,r)=>s+r.i2p,0),s2d=INSDATA.reduce((s,r)=>s+r.i2d,0),s3p=INSDATA.reduce((s,r)=>s+r.i3p,0),s3d=INSDATA.reduce((s,r)=>s+r.i3d,0);
+  h+=`<tr class="tot ins-tbl"><td>TOTAL</td><td>${sp}</td><td>${sd}</td><td>${fL(ti1)}</td><td>${s2p}</td><td>${s2d}</td><td>${fL(ti2)}</td><td>${s3p}</td><td>${s3d}</td><td>${fL(ti3)}</td></tr>`;
+  document.getElementById("ins-tbody").innerHTML=h;
+}
+function rPayAcc(){
+  dc("py");
+  const lb=["JODO","Loan","Full Payment","Not Confirmed"],vs=lb.map(p=>D.pm[p]||0),cols=["#01354D","#1F7BB2","#FFC10E","#8B98A8"],tot=vs.reduce((a,b)=>a+b,0);
+  CH["py"]=new Chart(document.getElementById("ch-py"),{
+    type:"doughnut",
+    data:{labels:lb.map((l,i)=>`${l} — ${vs[i]}`),datasets:[{data:vs,backgroundColor:cols,borderWidth:2,borderColor:"var(--su)",hoverOffset:5}]},
+    options:{...bo({ns:true}),cutout:"60%",plugins:{legend:lgOpts(),tooltip:{...bo().plugins.tooltip,callbacks:{label:c=>`${vs[c.dataIndex]} students (${tot?Math.round(vs[c.dataIndex]/tot*100):0}%)`}}}}
+  });
+  document.getElementById("pydet").innerHTML=lb.map((l,i)=>{const v=vs[i],pct=tot?Math.round(v/tot*100):0;return`<div class="pd"><div style="width:9px;height:9px;border-radius:50%;background:${cols[i]};flex-shrink:0"></div><div style="flex:1.5;font-size:12px;font-weight:500">${l}</div><div style="flex:2;height:5px;background:var(--bd);border-radius:3px;overflow:hidden"><div style="height:100%;width:${pct}%;background:${cols[i]};border-radius:3px"></div></div><div style="font-family:var(--fm);font-size:11px;font-weight:700;min-width:22px;text-align:right">${v}</div><div style="font-size:11px;color:var(--tm);min-width:30px;text-align:right">${pct}%</div></div>`;}).join('');
+  const epv=document.getElementById("pay-emp-view");
+  if(accPMview==="emp"){
+    epv.style.cssText="margin-top:14px;border-top:1px solid var(--bd);padding-top:14px";
+    const emps=Object.entries(D.em).filter(([e])=>e!=="Unknown").sort((a,b)=>b[1].t-a[1].t);
+    epv.innerHTML=`<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--tm);margin-bottom:10px">Payment Mode by Counselor</div><div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px">`+emps.map(([e])=>{
+      const eR=D.recs.filter(r=>r.e===e),ePM={};lb.forEach(p=>ePM[p]=0);eR.forEach(r=>{if(ePM[r.pm]!==undefined)ePM[r.pm]++;else ePM["Not Confirmed"]++;});
+      return`<div style="padding:11px;background:var(--sb);border:1px solid var(--bd);border-radius:9px"><div style="font-size:12.5px;font-weight:700;margin-bottom:8px;color:var(--nv)">${e.split(" ")[0]}</div>`+lb.map((p,i)=>`<div style="display:flex;align-items:center;gap:6px;margin-bottom:4px"><span style="width:7px;height:7px;border-radius:50%;background:${cols[i]};flex-shrink:0"></span><span style="font-size:11px;flex:1;color:var(--ts)">${p}</span><div style="flex:1.5;height:4px;background:var(--bd);border-radius:2px;overflow:hidden"><div style="height:100%;width:${eR.length?Math.round(ePM[p]/eR.length*100):0}%;background:${cols[i]};border-radius:2px"></div></div><span style="font-family:var(--fm);font-size:11px;min-width:18px;text-align:right">${ePM[p]}</span></div>`).join('')+`</div>`;
+    }).join('')+"</div>";
+  }else{epv.innerHTML="";}
+}
+
+// ── OPERATIONS ──
+function buildOps(){
+  if(document.getElementById("ops-cards").innerHTML.trim())return;
+  const mods=[
+    {ik:"warn",col:"#EE1C23",bg:"#FEF3F3",title:"Fee Defaulters",sub:"Students with overdue fee balances beyond the due date",badge:"Action Required"},
+    {ik:"gear",col:"#6B21A8",bg:"#F3E8FF",title:"Operational Issues",sub:"Track and resolve branch-level operational issues"},
+    {ik:"cash",col:"#059669",bg:"#ECFDF5",title:"Petty Cash",sub:"Daily petty cash entries and balance tracking"},
+  ];
+  document.getElementById("ops-cards").innerHTML=mods.map((m,i)=>`
+    <div class="ac-card" onclick="toggleOps(${i})">
+      <div class="ac-hd">
+        <div class="ac-left">
+          <div class="ac-ico" style="background:${m.bg};color:${m.col}">${ico(m.ik)}</div>
+          <div><div class="ac-title">${m.title}</div><div class="ac-sub">${m.sub}</div></div>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px">${m.badge?`<span style="font-size:9.5px;font-weight:700;padding:2px 8px;border-radius:99px;background:${m.bg};color:${m.col};border:1px solid">${m.badge}</span>`:''}<span style="color:var(--tm)">${ico("chev")}</span></div>
+      </div>
+      <div class="ac-body" id="opbd-${i}">
+        <div class="coming">📋 Connect Google Sheets to enable live data for this module.<br><span style="font-size:11px">Data will populate from the Operations sheet when Apps Script is deployed.</span></div>
+      </div>
+    </div>`).join('');
+}
+function toggleOps(i){document.getElementById("opbd-"+i).classList.toggle("open");}
+
+// ── REV VS EXP ──
+function buildRevExp(){
+  if(document.getElementById("revexp-content").innerHTML.trim())return;
+  const totalCol=BKDATA.reduce((s,r)=>s+r.col,0),totalBk=BKDATA.reduce((s,r)=>s+r.bk,0);
+  const mockExp={Salaries:380000,"Rent & Infra":120000,"Utilities":45000,"Marketing":80000,"Operations":55000};
+  const totalExp=Object.values(mockExp).reduce((a,b)=>a+b,0);
+  const net=totalCol-totalExp,netPct=totalCol?Math.round(net/totalCol*100):0;
+  document.getElementById("revexp-content").innerHTML=`
+    <div class="re-hero">
+      <div class="dummy-badge">${ico("warn")} Indicative Data — Expense figures are dummy values. Connect live data to update.</div>
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:14px;position:relative;z-index:1">
+        <div>
+          <div style="font-size:11px;font-weight:600;opacity:.55;letter-spacing:.07em;text-transform:uppercase;margin-bottom:6px">Net Surplus · YTD</div>
+          <div style="font-family:var(--fm);font-size:40px;font-weight:700;line-height:1">${fL(net)}</div>
+          <div style="font-size:12px;opacity:.65;margin-top:5px">${netPct}% margin · Revenue ${fL(totalCol)} · Expenses ${fL(totalExp)}</div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+          <div style="background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.15);border-radius:10px;padding:12px 16px"><div style="font-size:9.5px;opacity:.55;text-transform:uppercase;letter-spacing:.07em;margin-bottom:3px">Revenue Collected</div><div style="font-family:var(--fm);font-size:20px;font-weight:700">${fL(totalCol)}</div></div>
+          <div style="background:rgba(238,28,35,.2);border:1px solid rgba(238,28,35,.3);border-radius:10px;padding:12px 16px"><div style="font-size:9.5px;opacity:.55;text-transform:uppercase;letter-spacing:.07em;margin-bottom:3px">Expenses (Dummy)</div><div style="font-family:var(--fm);font-size:20px;font-weight:700">${fL(totalExp)}</div></div>
+        </div>
+      </div>
+    </div>
+    <div style="background:var(--y50);border:1px solid var(--y100);border-radius:10px;padding:10px 14px;margin-bottom:16px;font-size:12.5px;color:var(--yl2);display:flex;align-items:center;gap:8px"><span style="flex-shrink:0">${ico("warn")}</span><span><b>Note:</b> All expense figures shown here are dummy/indicative data. Connect actual expense data via Google Sheets to see real P&amp;L.</span></div>
+    <div class="g2">
+      <div class="blk" style="margin-bottom:0">
+        <div class="bh"><div class="bhl"><div class="bico bin" id="bico-re"></div><div><div class="bt">Revenue vs Expense</div><div class="bsub">Monthly comparison · Expense data is indicative</div></div></div></div>
+        <div class="bb"><div style="height:220px"><canvas id="ch-re"></canvas></div></div>
+      </div>
+      <div class="blk" style="margin-bottom:0">
+        <div class="bh"><div class="bhl"><div class="bico bir" id="bico-exp"></div><div><div class="bt">Expense Breakdown</div><div class="bsub">Indicative / dummy data</div></div></div></div>
+        <div class="bb">
+          <div style="height:170px;margin-bottom:12px"><canvas id="ch-exp"></canvas></div>
+          ${Object.entries(mockExp).map(([k,v],i)=>`<div class="pd"><div style="width:8px;height:8px;border-radius:50%;background:${COLS[i]};flex-shrink:0"></div><div style="flex:1;font-size:12px;font-weight:500">${k}</div><div style="flex:2;height:4px;background:var(--bd);border-radius:2px;overflow:hidden"><div style="height:100%;width:${Math.round(v/totalExp*100)}%;background:${COLS[i]};border-radius:2px"></div></div><div style="font-family:var(--fm);font-size:11px;font-weight:700;min-width:40px;text-align:right">${fL(v)}</div></div>`).join('')}
+        </div>
+      </div>
+    </div>`;
+  document.getElementById("bico-re").innerHTML=ico("bar");
+  document.getElementById("bico-exp").innerHTML=ico("pie");
+  const months=getMths();
+  setTimeout(()=>{
+    dc("re");
+    CH["re"]=new Chart(document.getElementById("ch-re"),{
+      type:"bar",
+      data:{labels:months.map(fM),datasets:[
+        {label:"Revenue",data:months.map(m=>Math.round((D.mm[m]||{rev:0}).rev)),backgroundColor:"#01354D",borderRadius:3,maxBarThickness:20},
+        {label:"Expenses (dummy)",data:months.map(()=>Math.round(totalExp/months.length)),backgroundColor:"rgba(238,28,35,.5)",borderRadius:3,maxBarThickness:20}
+      ]},
+      options:{...bo(),plugins:{...bo().plugins,legend:{display:true,position:"top",labels:{color:isDk()?"#8AAFC8":"#3D5166",font:{size:11,family:"Inter"},usePointStyle:true,pointStyleWidth:7}}}}
+    });
+    dc("exp");
+    CH["exp"]=new Chart(document.getElementById("ch-exp"),{
+      type:"doughnut",
+      data:{labels:Object.keys(mockExp).map((k,i)=>`${k} — ${fL(Object.values(mockExp)[i])}`),datasets:[{data:Object.values(mockExp),backgroundColor:COLS.slice(0,5),borderWidth:2,borderColor:"var(--su)"}]},
+      options:{...bo({ns:true}),cutout:"55%",plugins:{legend:lgOpts(),tooltip:{...bo().plugins.tooltip,callbacks:{label:c=>`${c.label.split(' — ')[0]}: ${fL(Object.values(mockExp)[c.dataIndex])}`}}}}
+    });
+  },80);
+}
+
+// ── INIT ──
+buildSidebar();
+setIcons();
+initBatchFilters();
+rAll();
+</script>
+</body>
+</html>
