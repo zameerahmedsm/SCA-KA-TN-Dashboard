@@ -1073,11 +1073,51 @@ function buildRevExp(){
   },80);
 }
 
+// ── LIVE DATA LOADER ──
+const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx2W9OF6D0Y-MbZmXTCbbkNm60BnGmejkW5K5G5WPrymL6cC_u1wVXOG8BM6h0E8G4g/exec";
+
+function loadLiveData(){
+  const script = document.createElement("script");
+  script.src = APPS_SCRIPT_URL + "?callback=onLiveData&t=" + Date.now();
+  script.onerror = () => { console.warn("Live data fetch failed, using hardcoded data."); };
+  document.head.appendChild(script);
+  // Timeout fallback – if no response in 8s, use hardcoded RECS
+  setTimeout(() => { if(!window._liveLoaded){ console.warn("Timeout – using hardcoded data."); } }, 8000);
+}
+
+window.onLiveData = function(payload){
+  window._liveLoaded = true;
+  if(!payload || !payload.records || !payload.records.length){
+    console.warn("Empty payload, using hardcoded data.");
+    return;
+  }
+  // Map live records to the RECS format the dashboard expects
+  const mapped = payload.records.map(r => ({
+    d  : r.date ? (()=>{ const[y,m]=r.date.split("-"); const months=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"]; return `${+m}-${months[+m-1]}-${y.slice(2)}`; })() : "",
+    b  : r.batch || r.class_ || "",
+    f  : r.mrp || 90000,
+    bk : r.bookingAmount || 0,
+    p  : r.totalPaid || 0,
+    e  : r.employee || "Unknown",
+    s  : r.status === "Dropout" ? "Dropout" : "Active",
+    dr : r.dropReason || "",
+    ba : r.bbcAbc || "",
+    pm : r.paymentMode || "Not Confirmed",
+  }));
+  D = buildD(mapped);
+  rAll();
+  // Update last-fetched indicator
+  const clk = document.getElementById("clk");
+  if(clk) clk.title = "Live data loaded · " + new Date().toLocaleTimeString("en-IN");
+  console.log("✅ Live data loaded:", mapped.length, "records");
+};
+
 // ── INIT ──
 buildSidebar();
 setIcons();
 initBatchFilters();
-rAll();
+rAll();          // render immediately with hardcoded data
+loadLiveData();  // then fetch live and re-render
 </script>
 </body>
 </html>
